@@ -6,6 +6,8 @@ namespace Adjaya\FastRoute;
 
 interface RouteCollectorDecoratorInterface
 {
+    public function getData(): array;
+
     public function groupAddons(
         callable $callback, RouteCollectorDecoratorInterface $collector = null): HandlingInterface;
 
