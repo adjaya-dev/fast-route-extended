@@ -1,0 +1,21 @@
+{
+    "name": "adjaya/fast-route-extended",
+    "description": "Extends FastRoute",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+          "name": "Adjaya"
+        }
+      ],
+    "autoload": {
+        "psr-4": {
+            "Adjaya\\FastRoute\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": "7.2.*",
+        "nikic/fast-route": "^1.3",
+        "spatie/macroable": "^1.0"
+    }
+}
