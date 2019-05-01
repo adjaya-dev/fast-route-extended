@@ -13,9 +13,11 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorBase
      */
     protected $HandlingProvider;
 
-    public function __construct(RouteCollectorInterface $RouteCollector)
+    public function __construct(RouteCollectorInterface $RouteCollector, ?array $options = null)
     {
         $this->RouteCollector = $RouteCollector;
+
+        if (!empty($options)) { $this->setOptions($options); }
     }
 
     /**
@@ -35,7 +37,7 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorBase
 
         if (isset($options['handlindProviderDecorators'])) {
             foreach ($options['handlindProviderDecorators'] as $decorator => $decorator_options) {
-                $this->setHandlingProviderDecorator($decorator, $decorator_options);
+                $this->setHandlingProviderDecorator($decorator, (array) $decorator_options);
             }
         }
     }

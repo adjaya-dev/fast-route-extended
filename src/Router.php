@@ -170,32 +170,12 @@ class Router
             foreach ($options['routeCollectorDecorators'] as $decorator => $v) {
                 $v = (array) $v;
                 if (isset($v['enabled']) && $v['enabled']) {
-                    $routeCollector = new $decorator($routeCollector);
-                    if (
-                        isset($v['options']) && $v['enabled']
-                        && method_exists($routeCollector, 'setOptions')
-                    ) {
-                        $setOptions = new \ReflectionMethod($routeCollector, 'setOptions');
-                        $setOptions->setAccessible(true);
-                        $setOptions->invokeArgs($routeCollector, [$v['options']]);
-                    }
+                    $options = null;
+                    if (isset($v['options'])) { $options = $v['options']; }
+                    $routeCollector = new $decorator($routeCollector, $options);
                 }
             }
         }
-/*
-        if ($options['addonDisabled'] === 'false' && isset($options['addonRouteCollector'])) {
-            $routeCollector = new $options['addonRouteCollector']($routeCollector); 
-        }
-
-        if (
-            isset($options['addonRouteCollectorOptions'])
-            && method_exists($routeCollector, 'setOptions')
-        ) {
-            $setOptions = new \ReflectionMethod($routeCollector, 'setOptions');
-            $setOptions->setAccessible(true);
-            $setOptions->invokeArgs($routeCollector, [$options['addonRouteCollectorOptions']]);
-        }
-        */
 
         $routeDefinitionCallback = $this->routeDefinitionCallback;
         $routeDefinitionCallback($routeCollector);

@@ -60,6 +60,7 @@ class HandlingProvider implements HandlingProviderInterface
 
     public function __construct(?array $options = [])
     {
+        var_dump($options);
         $this->routesAddonsDataCurrentIndex = & $this->routesAddonsData;
         
         if (isset($options['handling'])) {
@@ -78,6 +79,11 @@ class HandlingProvider implements HandlingProviderInterface
         $this->setOptions($options);
 
         $this->builtAddonsMacros($this->registeredAddons);
+    }
+
+    public function getRegisteredAddons() 
+    {
+        return $this->registeredAddons;
     }
 
     /**

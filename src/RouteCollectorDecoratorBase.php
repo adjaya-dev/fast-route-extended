@@ -11,9 +11,19 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
      */
     protected $RouteCollector;
 
-    public function __construct(RouteCollectorDecoratorInterface $RouteCollector)
+    protected $options;
+
+    public function __construct(RouteCollectorDecoratorInterface $RouteCollector,
+        ?array $options = null)
     {
         $this->RouteCollector = $RouteCollector;
+
+        if (!empty($options)) { $this->setOptions($options); }
+    }
+
+    protected function setOptions(array $options): void 
+    {
+        $this->options = $options;
     }
     
     public function getData(): array
@@ -29,8 +39,6 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
     public function groupAddons(callable $callback,
         RouteCollectorDecoratorInterface $collector = null): HandlingInterface
     {
-        if (!$collector) { $collector = $this; }
-
         return $this->addGroup('', $callback, $collector);
     }
 
