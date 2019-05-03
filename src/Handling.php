@@ -6,7 +6,7 @@ namespace Adjaya\FastRoute;
 
 class Handling extends AbstractHandling implements HandlingInterface
 {
-    use \Spatie\Macroable\Macroable;
+    //use \Spatie\Macroable\Macroable;
 
     /**
      * @var array
@@ -23,9 +23,33 @@ class Handling extends AbstractHandling implements HandlingInterface
      */
     protected $addons;
 
+    protected $ChildHandling;
+
     public function __construct(?array $addons = [])
     {
         $this->registerAddons($addons);
+    }
+
+    public function __call($method, $parameters): HandlingInterface
+    {
+        if (method_exists($this, $method)) {
+            call_user_func_array(array($this, $method), $parameters);
+        }
+
+        throw new \BadMethodCallException("Method {$method} does not exist.");
+    }
+    
+    public static function __callStatic($method, $parameters): \BadMethodCallException
+    {
+        throw new \BadMethodCallException("Method __callStatic is not allowed, can't call {$method}");
+    }
+
+    public function setChild($child): void {
+        $this->ChildHandling = $child;
+    }
+
+    public function getChild(): HandlingInterface {
+        return $this->ChildHandling;
     }
 
     /**
@@ -85,7 +109,7 @@ class Handling extends AbstractHandling implements HandlingInterface
     {
         $this->addons = $this->pushAddons($_addons, (array) $this->addons);
         
-        return $this;
+        return $this->getChild();
     }
 
     /**

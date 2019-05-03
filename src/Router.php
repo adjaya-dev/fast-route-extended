@@ -170,9 +170,11 @@ class Router
             foreach ($options['routeCollectorDecorators'] as $decorator => $v) {
                 $v = (array) $v;
                 if (isset($v['enabled']) && $v['enabled']) {
-                    $options = null;
-                    if (isset($v['options'])) { $options = $v['options']; }
-                    $routeCollector = new $decorator($routeCollector, $options);
+                    $_options = null;
+                    if (isset($v['options'])) { 
+                        $_options = $v['options']; 
+                    }
+                    $routeCollector = new $decorator($routeCollector, $_options);
                 }
             }
         }

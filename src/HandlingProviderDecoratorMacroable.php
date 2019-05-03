@@ -6,11 +6,28 @@ namespace Adjaya\FastRoute;
 
 class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 {
-    public function __construct(HandlingProvider $HandlingProvider, array $options)
+    protected $RouteHandlingDecoratorMacro;
+
+    protected $GroupHandlingDecoratorMacro;
+
+    public function __construct(HandlingProviderInterface $HandlingProvider, array $options)
     {
         $this->HandlingProvider = $HandlingProvider;
+        
+        $this->RouteHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
+            $this->HandlingProvider->setRouteHandlingDecorator($this->RouteHandlingDecoratorMacro);
+
+        $this->GroupHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
+            $this->HandlingProvider->setGroupHandlingDecorator($this->GroupHandlingDecoratorMacro);
 
         $this->setOptions($options);
+
+        $this->builtAddonsMacros($this->getRegisteredAddons());
+    }
+
+    protected function getHandlingDecoratorClass(): HandlingDecoratorInterface
+    {
+        return new class(new Handling()) extends HandlingDecoratorMacro {};
     }
 
     protected function setOptions(array $options): void
@@ -26,16 +43,24 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
      */
     protected function setMacroables(array $macroables): void
     {
+        var_dump($macroables);
         foreach ($macroables as $scope => $macros) 
         {
             foreach ($macros as $name => $m) 
             {
+                
                 if (\is_callable($m)) {
+                    var_dump('MMMMMMMAAAAAAAAA');
+                    var_dump($m);
+                    var_dump($this->RouteHandlingDecoratorMacro);
                     if ('global' === $scope || 'route' === $scope) {
-                        $this->_Handling['route']::macro($name, $m);
+                        
+                        $this->RouteHandlingDecoratorMacro::macro($name, $m);
+                        var_dump($name);
+                        var_dump($this->RouteHandlingDecoratorMacro::hasMacro($name));
                     } 
                     if ('global' === $scope || 'group' === $scope) {
-                        $this->_Handling['group']::macro($name, $m);
+                        $this->GroupHandlingDecoratorMacro::macro($name, $m);
                     }
 
                     continue;
@@ -51,10 +76,10 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 
                 if (\is_object($m)) {
                     if ('global' === $scope || 'route' === $scope) {
-                        $this->_Handling['route']::mixin($m);
+                        $this->RouteHandlingDecoratorMacro::mixin($m);
                     }
                     if ('global' === $scope || 'group' === $scope) {
-                        $this->_Handling['group']::mixin($m);
+                        $this->GroupHandlingDecoratorMacro::mixin($m);
                     }
                 }
             }
@@ -68,6 +93,8 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
      */
     protected function builtAddonsMacros(array $_addons): void 
     {
+        var_dump($_addons);
+        var_dump($this->getRegisteredAddons());
         foreach ($_addons as $scope => $addons) 
         {
             if (!isset($this->getRegisteredAddons()[$scope])) {
@@ -78,23 +105,24 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
             foreach ($addons as $k => $v) 
             {
                 if ($k === $v) {
-                    $callable = function ($args) use ($k): HandlingInterface {
+                    $callable = function ($args) use ($k) {
                         $this->add([$k => $args]);
 
-                        return $this;
+                        //return $this;
                     };
                 } else {
-                    $callable = function ($addon, $args) use ($k): HandlingInterface {
+                    $callable = function ($addon, $args) use ($k) {
                         $this->add([$k => [$addon => $args]]);
 
-                        return $this;
+                        //return $this;
                     };
                 }
 
                 if ($scope === 'route') {
-                    $this->_Handling['route']::macro($k, $callable);
+                    var_dump('SSSSSSSSSSSSS');
+                    $this->RouteHandlingDecoratorMacro::macro($k, $callable);
                 } elseif ($scope === 'group') {
-                    $this->_Handling['group']::macro($k, $callable);
+                    $this->GroupHandlingDecoratorMacro::macro($k, $callable);
                 }
             }
         }

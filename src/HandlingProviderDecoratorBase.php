@@ -8,9 +8,19 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
 {
     protected $HandlingProvider;
 
-    public function __construct(HandlingProvider $HandlingProvider)
+    public function __construct(HandlingProviderInterface $HandlingProvider)
     {
         $this->HandlingProvider = $HandlingProvider;
+    }
+
+    public function setRouteHandlingDecorator($routeHanlingDecorator): void
+    {
+        $this->HandlingProvider->setRouteHandlingDecorator($routeHanlingDecorator);
+    }
+
+    public function setGroupHandlingDecorator($groupHandlingDecorator): void
+    {
+        $this->HandlingProvider->setGroupHandlingDecorator($groupHandlingDecorator);
     }
 
     public function processAddons(array & $routesData): void
@@ -39,8 +49,8 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
         return $this->HandlingProvider->afterAddGroup($GroupHandling);
     }
 
-    public function getRegisteredAddons() 
+    public function getRegisteredAddons(): array 
     {
-        return $this->HandlingProvider->registeredAddons;
+        return $this->HandlingProvider->getRegisteredAddons();
     }
 }
