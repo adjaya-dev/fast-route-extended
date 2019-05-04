@@ -110,7 +110,7 @@ class HandlingProvider implements HandlingProviderInterface
         }
     }
 
-    protected function registerAddons($__addons): void 
+    public function registerAddons(array $__addons): void 
     {
         foreach ($__addons as $scope => $addons) 
         {

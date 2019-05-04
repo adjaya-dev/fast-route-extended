@@ -6,6 +6,8 @@ namespace Adjaya\FastRoute;
 
 interface HandlingProviderInterface 
 {
+    public function registerAddons(array $__addons): void; 
+
     public function getRegisteredAddons(): array; 
 
     public function setRouteHandlingDecorator($routeHanlingDecorator);

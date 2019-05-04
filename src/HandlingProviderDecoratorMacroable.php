@@ -20,9 +20,9 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
         $this->GroupHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
             $this->HandlingProvider->setGroupHandlingDecorator($this->GroupHandlingDecoratorMacro);
 
-        $this->setOptions($options);
-
         $this->builtAddonsMacros($this->getRegisteredAddons());
+
+        $this->setOptions($options);
     }
 
     protected function getHandlingDecoratorClass(): HandlingDecoratorInterface
@@ -36,6 +36,11 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
         {
             $this->setMacroables($options['macros']);
         }
+
+        if (isset($options['addons']) && !empty($options['addons'])) 
+        {
+            $this->HandlingProvider->registerAddons($options['addons']);
+        }
     }
 
     /**
@@ -43,22 +48,15 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
      */
     protected function setMacroables(array $macroables): void
     {
-        var_dump($macroables);
         foreach ($macroables as $scope => $macros) 
         {
             foreach ($macros as $name => $m) 
             {
-                
                 if (\is_callable($m)) {
-                    var_dump('MMMMMMMAAAAAAAAA');
-                    var_dump($m);
-                    var_dump($this->RouteHandlingDecoratorMacro);
                     if ('global' === $scope || 'route' === $scope) {
-                        
                         $this->RouteHandlingDecoratorMacro::macro($name, $m);
-                        var_dump($name);
-                        var_dump($this->RouteHandlingDecoratorMacro::hasMacro($name));
                     } 
+
                     if ('global' === $scope || 'group' === $scope) {
                         $this->GroupHandlingDecoratorMacro::macro($name, $m);
                     }
@@ -78,6 +76,7 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
                     if ('global' === $scope || 'route' === $scope) {
                         $this->RouteHandlingDecoratorMacro::mixin($m);
                     }
+
                     if ('global' === $scope || 'group' === $scope) {
                         $this->GroupHandlingDecoratorMacro::mixin($m);
                     }
@@ -93,8 +92,6 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
      */
     protected function builtAddonsMacros(array $_addons): void 
     {
-        var_dump($_addons);
-        var_dump($this->getRegisteredAddons());
         foreach ($_addons as $scope => $addons) 
         {
             if (!isset($this->getRegisteredAddons()[$scope])) {
@@ -119,7 +116,6 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
                 }
 
                 if ($scope === 'route') {
-                    var_dump('SSSSSSSSSSSSS');
                     $this->RouteHandlingDecoratorMacro::macro($k, $callable);
                 } elseif ($scope === 'group') {
                     $this->GroupHandlingDecoratorMacro::macro($k, $callable);
