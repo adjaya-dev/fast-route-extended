@@ -104,14 +104,10 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
                 if ($k === $v) {
                     $callable = function ($args) use ($k) {
                         $this->add([$k => $args]);
-
-                        //return $this;
                     };
                 } else {
                     $callable = function ($addon, $args) use ($k) {
                         $this->add([$k => [$addon => $args]]);
-
-                        //return $this;
                     };
                 }
 

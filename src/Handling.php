@@ -34,6 +34,8 @@ class Handling extends AbstractHandling implements HandlingInterface
     {
         if (method_exists($this, $method)) {
             call_user_func_array(array($this, $method), $parameters);
+
+            return $this->getChild();
         }
 
         throw new \BadMethodCallException("Method {$method} does not exist.");
@@ -105,9 +107,9 @@ class Handling extends AbstractHandling implements HandlingInterface
      *
      * @return object $this this Handling instance
      */
-    public function add(array $_addons): HandlingInterface
+    public function add(array $addons): HandlingInterface
     {
-        $this->addons = $this->pushAddons($_addons, (array) $this->addons);
+        $this->addons = $this->pushAddons($addons, (array) $this->addons);
         
         return $this->getChild();
     }

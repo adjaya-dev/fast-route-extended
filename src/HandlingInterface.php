@@ -10,5 +10,5 @@ interface HandlingInterface
 
     public static function __callStatic($method, $parameters): \BadMethodCallException;
 
-    public function add(array $_addons): HandlingInterface;
+    public function add(array $addons): HandlingInterface;
 }

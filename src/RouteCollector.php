@@ -44,7 +44,7 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      *
      * @param string|array $prefix
      */
-    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null): void
+    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorAddonInterface $collector = null): void
     {
         if (!$collector) { $collector = $this; }
 
