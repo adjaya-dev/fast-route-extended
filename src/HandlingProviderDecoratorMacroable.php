@@ -4,13 +4,32 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
+use Exception;
+
 class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 {
-    public function __construct(HandlingProvider $HandlingProvider, array $options)
+    protected $RouteHandlingDecoratorMacro;
+
+    protected $GroupHandlingDecoratorMacro;
+
+    public function __construct(HandlingProviderInterface $HandlingProvider, array $options)
     {
         $this->HandlingProvider = $HandlingProvider;
+        
+        $this->RouteHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
+            $this->HandlingProvider->setRouteHandlingDecorator($this->RouteHandlingDecoratorMacro);
+
+        $this->GroupHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
+            $this->HandlingProvider->setGroupHandlingDecorator($this->GroupHandlingDecoratorMacro);
+
+        $this->builtAddonsMacros($this->getRegisteredAddons());
 
         $this->setOptions($options);
+    }
+
+    protected function getHandlingDecoratorClass(): HandlingDecoratorInterface
+    {
+        return new class(new Handling()) extends HandlingDecoratorMacro {};
     }
 
     protected function setOptions(array $options): void
@@ -18,6 +37,11 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
         if (isset($options['macros']) && !empty($options['macros'])) 
         {
             $this->setMacroables($options['macros']);
+        }
+
+        if (isset($options['addons']) && !empty($options['addons'])) 
+        {
+            $this->HandlingProvider->registerAddons($options['addons']);
         }
     }
 
@@ -32,10 +56,11 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
             {
                 if (\is_callable($m)) {
                     if ('global' === $scope || 'route' === $scope) {
-                        $this->_Handling['route']::macro($name, $m);
+                        $this->RouteHandlingDecoratorMacro::macro($name, $m);
                     } 
+
                     if ('global' === $scope || 'group' === $scope) {
-                        $this->_Handling['group']::macro($name, $m);
+                        $this->GroupHandlingDecoratorMacro::macro($name, $m);
                     }
 
                     continue;
@@ -51,10 +76,11 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 
                 if (\is_object($m)) {
                     if ('global' === $scope || 'route' === $scope) {
-                        $this->_Handling['route']::mixin($m);
+                        $this->RouteHandlingDecoratorMacro::mixin($m);
                     }
+
                     if ('global' === $scope || 'group' === $scope) {
-                        $this->_Handling['group']::mixin($m);
+                        $this->GroupHandlingDecoratorMacro::mixin($m);
                     }
                 }
             }
@@ -78,23 +104,19 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
             foreach ($addons as $k => $v) 
             {
                 if ($k === $v) {
-                    $callable = function ($args) use ($k): HandlingInterface {
+                    $callable = function ($args) use ($k) {
                         $this->add([$k => $args]);
-
-                        return $this;
                     };
                 } else {
-                    $callable = function ($addon, $args) use ($k): HandlingInterface {
+                    $callable = function ($addon, $args) use ($k) {
                         $this->add([$k => [$addon => $args]]);
-
-                        return $this;
                     };
                 }
 
                 if ($scope === 'route') {
-                    $this->_Handling['route']::macro($k, $callable);
+                    $this->RouteHandlingDecoratorMacro::macro($k, $callable);
                 } elseif ($scope === 'group') {
-                    $this->_Handling['group']::macro($k, $callable);
+                    $this->GroupHandlingDecoratorMacro::macro($k, $callable);
                 }
             }
         }

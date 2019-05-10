@@ -12,6 +12,8 @@ use FastRoute\RouteParser;
 class RouteCollector extends FastRouteCollector implements RouteCollectorInterface
 {
     protected $currentRouteId;
+    protected $routeIdPrefix = 'route_';
+    protected $routeIdCount = 0;
     
     /**
      * Routes Data.
@@ -44,7 +46,7 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      *
      * @param string|array $prefix
      */
-    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null): void
+    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorAddonInterface $collector = null): void
     {
         if (!$collector) { $collector = $this; }
 
@@ -79,7 +81,9 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      */
     public function addRoute($httpMethod, $route, $handler): void
     {
+        $this->currentRouteId = $this->routeIdPrefix.$this->routeIdCount++;
         $route_name = '';
+
         if ($this->currentGroupName) {
             $route_name = $this->currentGroupName;
         }
@@ -102,7 +106,7 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
 
         foreach ((array) $httpMethod as $method) {
             foreach ($routesData as $routeData) {
-                $this->dataGenerator->addRoute($method, $routeData, $route_id);
+                $this->dataGenerator->addRoute($method, $routeData, $this->currentRouteId);
             }
         }
 
@@ -118,12 +122,12 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
             $this->routesData['reverse'][$route_name] =
                 $this->routeParser->parseReverse($routesData);
 
-            $this->routesData['named'][$route_id] = $route_name;
+            $this->routesData['named'][$this->currentRouteId] = $route_name;
         }
 
-        $this->routesData['info'][$route_id]['handler'] = $handler;
+        $this->routesData['info'][$this->currentRouteId]['handler'] = $handler;
 
-        $this->currentRouteId = $route_id;
+        //$this->currentRouteId = $route_id;
     }
 
     public function getCurrentRouteId(): string 

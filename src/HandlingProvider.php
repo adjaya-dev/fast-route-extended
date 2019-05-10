@@ -58,9 +58,12 @@ class HandlingProvider implements HandlingProviderInterface
      */
     protected $setGroupHandlers;
 
+    protected $RouteHandlingDecorator = [];
+
+    protected $GroupHandlingDecorator = [];
+
     public function __construct(?array $options = [])
     {
-        var_dump($options);
         $this->routesAddonsDataCurrentIndex = & $this->routesAddonsData;
         
         if (isset($options['handling'])) {
@@ -77,13 +80,21 @@ class HandlingProvider implements HandlingProviderInterface
         ];
 
         $this->setOptions($options);
-
-        $this->builtAddonsMacros($this->registeredAddons);
     }
 
-    public function getRegisteredAddons() 
+    public function getRegisteredAddons(): array 
     {
         return $this->registeredAddons;
+    }
+
+    public function setRouteHandlingDecorator($routeHandlingDecorator): void
+    {
+        $this->RouteHandlingDecorator[] = $routeHandlingDecorator;
+    }
+
+    public function setGroupHandlingDecorator($groupHandlingDecorator): void
+    {
+        $this->GroupHandlingDecorator[] = $groupHandlingDecorator;
     }
 
     /**
@@ -97,14 +108,9 @@ class HandlingProvider implements HandlingProviderInterface
         {
             $this->registerAddons($options['addons']);
         }
-
-        if (isset($options['macros']) && !empty($options['macros'])) 
-        {
-            $this->setMacroables($options['macros']);
-        }
     }
 
-    protected function registerAddons($__addons) 
+    public function registerAddons(array $__addons): void 
     {
         foreach ($__addons as $scope => $addons) 
         {
@@ -126,88 +132,9 @@ class HandlingProvider implements HandlingProviderInterface
                     array_merge($this->registeredAddons['route'], $_addons);
             }
 
-            if ($scope === 'group' || $scope = 'global') {
+            if ($scope === 'group' || $scope === 'global') {
                 $this->registeredAddons['group'] = 
                     array_merge($this->registeredAddons['group'], $_addons);
-            }
-        }
-    }
-
-    /**
-     * @param array  $macroables
-     */
-    protected function setMacroables(array $macroables): void
-    {
-        foreach ($macroables as $scope => $macros) 
-        {
-            foreach ($macros as $name => $m) 
-            {
-                if (\is_callable($m)) {
-                    if ('global' === $scope || 'route' === $scope) {
-                        $this->_Handling['route']::macro($name, $m);
-                    } 
-                    if ('global' === $scope || 'group' === $scope) {
-                        $this->_Handling['group']::macro($name, $m);
-                    }
-
-                    continue;
-                }
-                
-                if (!\is_object($m)) {
-                    if (class_exists($m)) {
-                        $m = new $m();
-                    } else {
-                        throw new Exception("Class $m not Found!");
-                    }
-                }
-
-                if (\is_object($m)) {
-                    if ('global' === $scope || 'route' === $scope) {
-                        $this->_Handling['route']::mixin($m);
-                    }
-                    if ('global' === $scope || 'group' === $scope) {
-                        $this->_Handling['group']::mixin($m);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Built chainable macros.
-     * 
-     * @param   array  $_addons
-     */
-    protected function builtAddonsMacros(array $_addons): void 
-    {
-        foreach ($_addons as $scope => $addons) 
-        {
-            if (!isset($this->registeredAddons[$scope])) {
-                $s = implode (' or ',  array_keys($this->registeredAddons));
-                throw new Exception("$scope is not allowed. Allowed : $s.");
-            }
-
-            foreach ($addons as $k => $v) 
-            {
-                if ($k === $v) {
-                    $callable = function ($args) use ($k): HandlingInterface {
-                        $this->add([$k => $args]);
-
-                        return $this;
-                    };
-                } else {
-                    $callable = function ($addon, $args) use ($k): HandlingInterface {
-                        $this->add([$k => [$addon => $args]]);
-
-                        return $this;
-                    };
-                }
-
-                if ($scope === 'route') {
-                    $this->_Handling['route']::macro($k, $callable);
-                } elseif ($scope === 'group') {
-                    $this->_Handling['group']::macro($k, $callable);
-                }
             }
         }
     }
@@ -309,17 +236,34 @@ class HandlingProvider implements HandlingProviderInterface
      * @return HandlingInterface $RouteHandling
      */
     public function afterAddRoute(
-        HandlingInterface $RouteHandling, string $route_id): HandlingInterface
+        HandlingInterface $O_RouteHandling, string $route_id): HandlingInterface
     {
         $this->setRouteHandlers->invokeArgs(
-            $RouteHandling,
+            $O_RouteHandling,
             [
                 & $this->routesAddonsDataCurrentIndex[$route_id],
                 $route_id
             ]
         );
 
-        return $RouteHandling;
+        $i = 0;
+        if (!empty($this->RouteHandlingDecorator))
+        {
+            foreach ($this->RouteHandlingDecorator as $decorator) {
+                if ($i === 0) {
+                    $RouteHandling = new $decorator($O_RouteHandling);
+                    $i++;
+                }
+
+                $RouteHandling = new $decorator($RouteHandling);
+            }
+        } else {
+            $RouteHandling = $O_RouteHandling;
+        } 
+       
+       $O_RouteHandling->setChild($RouteHandling);
+        
+       return $RouteHandling;
     }
 
     /**
@@ -332,17 +276,36 @@ class HandlingProvider implements HandlingProviderInterface
         $this->routesAddonsDataCurrentIndex =
         & $this->routesAddonsDataCurrentIndex[];
 
-        $GroupHandling = $this->getGroupHandling();
+        $O_GroupHandling = $this->getGroupHandling();
 
         $previousIndex = & $this->groupsAddonsDataPreviousIndex();
-        $previousIndex[spl_object_id($GroupHandling)] = & $previousIdx;
 
         $this->setGroupHandlers->invokeArgs(
-            $GroupHandling,
+            $O_GroupHandling,
             [
                 & $this->routesAddonsDataCurrentIndex['*addons*']
             ]
         );
+
+        $i = 0;
+        if (!empty($this->GroupHandlingDecorator))
+        {
+            foreach ($this->GroupHandlingDecorator as $decorator) 
+            {
+                if ($i === 0) {
+                    $GroupHandling = new $decorator($O_GroupHandling);
+                    $i++;
+                }
+
+                $GroupHandling = new $decorator($GroupHandling);
+            }
+        } else {
+            $GroupHandling = $O_GroupHandling;
+        }
+
+        $O_GroupHandling->setChild($GroupHandling);
+        
+        $previousIndex[spl_object_id($GroupHandling)] = & $previousIdx;
 
         return $GroupHandling;
     }
@@ -363,7 +326,7 @@ class HandlingProvider implements HandlingProviderInterface
     /**
      * @return  & array
      */
-    protected function & groupsAddonsDataPreviousIndex() 
+    protected function & groupsAddonsDataPreviousIndex(): array 
     {
         return self::$groupsAddonsDataPreviousIndex;
     }

@@ -8,7 +8,7 @@ interface RouteCollectorInterface
 {
     public function getData(): array;
 
-    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null);
+    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorAddonInterface $collector = null);
 
     public function addRoute($httpMethod, $route, $handler);
 

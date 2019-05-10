@@ -15,6 +15,8 @@ class Router
      */
     protected $routesData;
 
+    //protected $RouterDispatcher;
+
     /**
      * @var object
      */
@@ -30,14 +32,38 @@ class Router
      */
     protected $options =
     [
-        'routeParser'    => 'FastRoute\\RouteParser\\Std',
-        'dataGenerator'  => 'FastRoute\\DataGenerator\\GroupCountBased',
-        'dispatcher'     => 'FastRoute\\Dispatcher\\GroupCountBased',
-        'routeCollector' => 'FastRoute\\RouteCollector',
+        'routeParser' =>    'Adjaya\\FastRoute\\RouteParser\\Std',
+        'dataGenerator' =>  'Adjaya\\FastRoute\\DataGenerator\\MarkBased',
+        'dispatcher' =>     'Adjaya\\FastRoute\\Dispatcher\\MarkBased',
+        'routeCollector' => 'Adjaya\\FastRoute\\RouteCollector',
         'cacheDisabled'  => false,
-        'addonDisabled' => true,
+        //'addonDisabled' =>  true,
+        'routeCollectorDecorators' => [
+            'Adjaya\\FastRoute\\RouteCollectorDecoratorAddon' => 
+            [
+                'enabled' => true,
+                'options' => [
+                    'handlingProvider' => "Adjaya\\FastRoute\\HandlingProvider",
+                    'handlindProviderDecorators' => [
+                        "Adjaya\\FastRoute\\HandlingProviderDecoratorMacroable" => [
+                            'macros' => [
+                            ],
+                            'addons' => [
+                                'route' => [],
+                            ],
+                        ],
+                        //"Adjaya\\FastRoute\\HandlingProviderDecoratorBase" => [],   
+                    ],
+                ],
+                'addons' => [
+                  'global' => [
+                  ],
+                  'route' => [
+                  ],
+                ],
+            ],
+        ],
     ];
-
     /**
      * @param callable $routeDefinitionCallback
      * @param array    $options
@@ -46,6 +72,23 @@ class Router
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;
         $this->options = $options + $this->options;
+    }
+
+    public function getCachedRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
+    {
+        $this->setCachedDispatcher();
+        return $this->getRouterDispatcher($Request);
+    }
+
+    public function getSimpleRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
+    {
+        $this->setSimpleDispatcher();
+        return $this->getRouterDispatcher($Request);
+    }
+
+    Protected function getRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
+    {
+        return new RouterDispatcher($this->Dispatcher, $Request);
     }
 
     /**
@@ -58,12 +101,12 @@ class Router
     {
         if ($this->dispatcher) {
             $routeInfo = $this->dispatcher->dispatch($method, $path);
-
+            /*
             if (isset($routeInfo[1]) && \is_string($routeInfo[1])
                 && $route = $this->getRouteInfo($routeInfo[1])) {
                 $routeInfo[1] = $route;
             }
-
+            */
             return $routeInfo;
         }
         throw new LogicException('Dispatcher must be set first');
@@ -154,7 +197,7 @@ class Router
     {
         $this->setRoutesData($dispatchData);
 
-        $this->dispatcher = new $this->options['dispatcher']($dispatchData);
+        $this->dispatcher = new $this->options['dispatcher']($dispatchData, $this->routesData);
     }
 
     public function simpleRoutes(): array
@@ -170,9 +213,11 @@ class Router
             foreach ($options['routeCollectorDecorators'] as $decorator => $v) {
                 $v = (array) $v;
                 if (isset($v['enabled']) && $v['enabled']) {
-                    $options = null;
-                    if (isset($v['options'])) { $options = $v['options']; }
-                    $routeCollector = new $decorator($routeCollector, $options);
+                    $_options = null;
+                    if (isset($v['options'])) { 
+                        $_options = $v['options']; 
+                    }
+                    $routeCollector = new $decorator($routeCollector, $_options);
                 }
             }
         }

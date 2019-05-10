@@ -6,7 +6,7 @@ namespace Adjaya\FastRoute;
 
 use Exception;
 
-class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorBase
+class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
 {
     /**
      * @var HandlingProvider instance
@@ -85,7 +85,7 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorBase
      * @return HandlingInterface new instance of GroupHandling
      */
     public function addGroup($prefix, callable $callback,
-        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
+        RouteCollectorDecoratorAddonInterface $collector = null): HandlingInterface
     {
         if (!$collector) { $collector = $this; }
 
