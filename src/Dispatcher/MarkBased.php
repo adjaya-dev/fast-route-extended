@@ -8,7 +8,7 @@ class MarkBased extends RegexBasedAbstract
     {
         list($this->staticRouteMap, $this->variableRouteData) = $data;
         $this->routesData = $routesData;
-        var_dump($this->routesData);
+        //var_dump($this->routesData);
     }
 
     protected function dispatchVariableRoute($routeData, $uri)
@@ -27,7 +27,11 @@ class MarkBased extends RegexBasedAbstract
                 $vars = [];
                 $i = 0;
                 foreach ($varNames as $varName) {
-                    $vars[$varName] = $matches[++$i];
+                    if (isset($matches[++$i])) {
+                        $vars[$varName] = $matches[$i];
+                    } else {
+                        $vars[$varName] = null;
+                    }
                 }
                 $routes[] = [$route_id, $vars];
             }

@@ -175,11 +175,6 @@ class HandlingProvider implements HandlingProviderInterface
                 if (isset($group_addons)) {
                     array_unshift($group_addons, $result[$k]);
                     $result[$k] = call_user_func_array('array_merge_recursive', $group_addons);
-
-                    var_dump('********$result[$k]********');
-                    echo '<pre>';
-                    print_r($result[$k]);
-                    echo '</pre>';
                 }
             } else { // $v is numeric
                 $this->_processAddons($v, $result, $current_addons);

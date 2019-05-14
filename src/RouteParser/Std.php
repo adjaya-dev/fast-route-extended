@@ -11,6 +11,71 @@ use RuntimeException;
 
 class Std extends RouteParserStd
 {
+    public function parse($route)
+    {
+        $routeWithoutClosingOptionals = rtrim($route, ']');
+        $numOptionals = strlen($route) - strlen($routeWithoutClosingOptionals);
+
+        // Split on [ while skipping placeholders
+        $segments = preg_split('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \[~x', $routeWithoutClosingOptionals);
+
+        if ($numOptionals !== count($segments) - 1) {
+            // If there are any ] in the middle of the route, throw a more specific error message
+            if (preg_match('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \]~x', $routeWithoutClosingOptionals)) {
+                throw new BadRouteException('Optional segments can only occur at the end of a route');
+            }
+            throw new BadRouteException("Number of opening '[' and closing ']' does not match");
+        }
+
+        $routeDatas = [];
+
+        foreach ($segments as $n => $segment) {
+            if ($segment === '' && $n !== 0) {
+                throw new BadRouteException('Empty optional part');
+            }
+
+            $routeDatas[] = $this->parsePlaceholders($segment);
+
+        }
+
+        return $routeDatas;
+    }
+
+    /**
+     * Parses a route string that does not contain optional segments.
+     *
+     * @param string
+     * @return mixed[]
+     */
+    private function parsePlaceholders($route)
+    {
+        if (!preg_match_all(
+            '~' . self::VARIABLE_REGEX . '~x', $route, $matches,
+            PREG_OFFSET_CAPTURE | PREG_SET_ORDER
+        )) {
+            return [$route];
+        }
+
+        $offset = 0;
+        $routeData = [];
+        foreach ($matches as $set) {
+            if ($set[0][1] > $offset) {
+                $routeData[] = substr($route, $offset, $set[0][1] - $offset);
+            }
+            $routeData[] = [
+                $set[1][0],
+                isset($set[2]) ? trim($set[2][0]) : self::DEFAULT_DISPATCH_REGEX
+            ];
+            $offset = $set[0][1] + strlen($set[0][0]);
+        }
+
+        if ($offset !== strlen($route)) {
+            $routeData[] = substr($route, $offset);
+        }
+
+        return $routeData;
+    }
+
     /**
      * @param array $reverseDatas
      *
@@ -112,8 +177,6 @@ class Std extends RouteParserStd
     public function parseReverse(array $routeData): array
     {
         $reverse = [];
-        $prevVarsCount = 0;
-        $prevUrl = '';
 
         foreach ($routeData as $k => $route) {
             $url = '';
@@ -132,23 +195,6 @@ class Std extends RouteParserStd
                     $url .= '%s';
                     $vars[] = $part;
                 }
-            }
-
-            if ($k >= 1) {
-                $prevVarsCount += \count($reverse[$k - 1][1]);
-
-                $varsCount = \count($vars) - $prevVarsCount;
-
-                $_vars = [];
-
-                for ($i = $varsCount - 1; $i >= 0; --$i) {
-                    $_vars[$i] = array_pop($vars);
-                }
-                ksort($_vars);
-                $vars = $_vars;
-
-                $prevUrl .= $reverse[$k - 1][0];
-                $url = preg_replace("~^($prevUrl)~", '', $url);
             }
 
             $reverse[] = [$url, $vars];

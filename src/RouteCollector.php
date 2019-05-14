@@ -34,7 +34,11 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      */
     public function getData(): array
     {
-        $routes_data = parent::getData();
+        $routes_data = $this->dataGenerator->getData();
+        var_dump('**********$_routes_data******************');
+        echo '<pre>';
+        print_r($routes_data);
+        echo '</pre>';
 
         $routes_data['routes_data'] = $this->routesData;
         
@@ -46,7 +50,8 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      *
      * @param string|array $prefix
      */
-    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorAddonInterface $collector = null): void
+    public function addGroup($prefix, callable $callback, 
+        RouteCollectorDecoratorAddonInterface $collector = null): void
     {
         if (!$collector) { $collector = $this; }
 
@@ -94,21 +99,11 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
             $route = $route[key($route)];
         }
 
-        $route_id = '';
-        foreach ((array) $httpMethod as $method) {
-            $route_id .= $method . '.';
-        }
-
         $currentRoute = $this->currentGroupPrefix . $route;
-        $route_id .= $currentRoute;
 
-        $routesData = $this->routeParser->parse($currentRoute);
+        $route_data = $this->routeParser->parse($currentRoute);
 
-        foreach ((array) $httpMethod as $method) {
-            foreach ($routesData as $routeData) {
-                $this->dataGenerator->addRoute($method, $routeData, $this->currentRouteId);
-            }
-        }
+        $this->dataGenerator->addRoute($httpMethod, $route_data, $this->currentRouteId);
 
         if ($route_name && method_exists($this->routeParser, 'parseReverse')) {
             if (isset($this->routesData['reverse']) &&
@@ -120,14 +115,12 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
             }
 
             $this->routesData['reverse'][$route_name] =
-                $this->routeParser->parseReverse($routesData);
+                $this->routeParser->parseReverse($route_data);
 
             $this->routesData['named'][$this->currentRouteId] = $route_name;
         }
 
         $this->routesData['info'][$this->currentRouteId]['handler'] = $handler;
-
-        //$this->currentRouteId = $route_id;
     }
 
     public function getCurrentRouteId(): string 

@@ -13,17 +13,18 @@ class MarkBased extends RegexBasedAbstract
     {
         $routeMap = [];
         $regexes = [];
-        $markName = 'a';
+        $markIndex = 0;
+        
         foreach ($regexToRoutesMap as $regex => $_route) {
             // Allow Multiple routes matching same regex
             $routeStack = [];
             foreach ($_route as $key => $route) {
                 $routeStack[] = [$route->handler, $route->variables];
             }
-            $regexes[] = $regex . '(*MARK:' . $markName . ')';
-            $routeMap[$markName] = $routeStack;
+            $regexes[] = $regex . '(*:' . $markIndex . ')';
+            $routeMap[$markIndex] = $routeStack;
 
-            ++$markName;
+            ++$markIndex;
         }
 
         $regex = '~^(?|' . implode('|', $regexes) . ')$~';
