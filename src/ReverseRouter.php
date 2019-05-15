@@ -35,17 +35,17 @@ class ReverseRouter
      *
      * @return string The formated route uri
      */
-    public function route(string $id, ...$params): string
+    public function route(string $name, ...$params): string
     {
-        if (isset($this->reverseRoutesData[$id])) {
+        if (isset($this->reverseRoutesData[$name])) {
             $route = $this->reverseFunction;
 
             if ($params) {
-                return $route($this->reverseRoutesData[$id], ...$params);
+                return $route($this->reverseRoutesData[$name], ...$params);
             }
 
-            return $route($this->reverseRoutesData[$id]);
+            return $route($this->reverseRoutesData[$name]);
         }
-        throw new Exception("The route name '$id' does not exists");
+        throw new Exception("The route name '$name' does not exists");
     }
 }

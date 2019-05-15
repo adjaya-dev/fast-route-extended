@@ -26,5 +26,5 @@ interface DispatcherInterface
      *
      * @return array
      */
-    public function dispatch($httpMethod, $uri, ?RequestInterface $Request = null);
+    public function dispatch($httpMethod, $uri, ?RequestInterface $Request = null): array;
 }

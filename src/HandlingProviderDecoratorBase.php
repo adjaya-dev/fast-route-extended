@@ -18,14 +18,14 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
         $this->HandlingProvider->registerAddons($__addons);
     }
 
-    public function setRouteHandlingDecorator($routeHanlingDecorator): void
+    public function setRouteHandlingDecorator(string $routeHandlingDecoratorClass): void
     {
-        $this->HandlingProvider->setRouteHandlingDecorator($routeHanlingDecorator);
+        $this->HandlingProvider->setRouteHandlingDecorator($routeHanlingDecoratorClass);
     }
 
-    public function setGroupHandlingDecorator($groupHandlingDecorator): void
+    public function setGroupHandlingDecorator(string $groupHandlingDecoratorClass): void
     {
-        $this->HandlingProvider->setGroupHandlingDecorator($groupHandlingDecorator);
+        $this->HandlingProvider->setGroupHandlingDecorator($groupHandlingDecoratorClass);
     }
 
     public function processAddons(array & $routesData): void

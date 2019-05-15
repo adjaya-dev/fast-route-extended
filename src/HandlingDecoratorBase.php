@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
+use BadMethodCallException;
+
 class HandlingDecoratorBase implements HandlingDecoratorInterface
 {
+    /**
+     * @var HandlingInterface
+     */
     protected $Handling;
-    
 
     public function __construct(HandlingInterface $Handling)
     {
@@ -26,9 +30,9 @@ class HandlingDecoratorBase implements HandlingDecoratorInterface
         return $this->getChild();
     }
 
-    public static function __callStatic($method, $parameters): \BadMethodCallException
+    public static function __callStatic($method, $parameters): BadMethodCallException
     {
-        throw new \BadMethodCallException("Method __callStatic is not allowed, can't call {$method}");
+        throw new BadMethodCallException("Method __callStatic is not allowed, can't call {$method}");
     }
 
     public function add(array $_addons): HandlingInterface

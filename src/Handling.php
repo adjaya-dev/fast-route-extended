@@ -6,8 +6,6 @@ namespace Adjaya\FastRoute;
 
 class Handling extends AbstractHandling implements HandlingInterface
 {
-    //use \Spatie\Macroable\Macroable;
-
     /**
      * @var array
      */
@@ -46,12 +44,14 @@ class Handling extends AbstractHandling implements HandlingInterface
         throw new \BadMethodCallException("Method __callStatic is not allowed, can't call {$method}");
     }
 
-    public function setChild($child): void {
+    public function setChild(HandlingInterface $child): void 
+    {
         $this->ChildHandling = $child;
     }
 
-    public function getChild(): HandlingInterface {
-        return $this->ChildHandling;
+    public function getChild(): HandlingInterface 
+    {
+        return $this->ChildHandling ? $this->ChildHandling : $this;
     }
 
     /**

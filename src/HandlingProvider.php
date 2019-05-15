@@ -87,14 +87,14 @@ class HandlingProvider implements HandlingProviderInterface
         return $this->registeredAddons;
     }
 
-    public function setRouteHandlingDecorator($routeHandlingDecorator): void
+    public function setRouteHandlingDecorator(string $routeHandlingDecoratorClass): void
     {
-        $this->RouteHandlingDecorator[] = $routeHandlingDecorator;
+        $this->RouteHandlingDecorator[] = $routeHandlingDecoratorClass;
     }
 
-    public function setGroupHandlingDecorator($groupHandlingDecorator): void
+    public function setGroupHandlingDecorator(string $groupHandlingDecoratorClass): void
     {
-        $this->GroupHandlingDecorator[] = $groupHandlingDecorator;
+        $this->GroupHandlingDecorator[] = $groupHandlingDecoratorClass;
     }
 
     /**
@@ -110,9 +110,9 @@ class HandlingProvider implements HandlingProviderInterface
         }
     }
 
-    public function registerAddons(array $__addons): void 
+    public function registerAddons(array $addons_stack): void 
     {
-        foreach ($__addons as $scope => $addons) 
+        foreach ($addons_stack as $scope => $addons) 
         {
             $_addons = [];
 

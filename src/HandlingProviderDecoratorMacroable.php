@@ -8,8 +8,14 @@ use Exception;
 
 class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 {
+    /**
+     * HandlingDecoratorInterface
+     */
     protected $RouteHandlingDecoratorMacro;
 
+    /**
+     * HandlingDecoratorInterface
+     */
     protected $GroupHandlingDecoratorMacro;
 
     public function __construct(HandlingProviderInterface $HandlingProvider, array $options)

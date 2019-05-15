@@ -30,7 +30,7 @@ abstract class RegexBasedAbstract implements DispatcherInterface
         return [self::FOUND, $routes];
     }
 
-    public function dispatch($httpMethod, $uri, ?RequestInterface $Request = null) 
+    public function dispatch($httpMethod, $uri, ?RequestInterface $Request = null): array 
     {
         $result = $this->_dispatch($httpMethod, $uri);
         switch ($result[0]) {

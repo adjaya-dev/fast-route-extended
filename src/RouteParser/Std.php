@@ -79,9 +79,9 @@ class Std extends RouteParserStd
     /**
      * @param array $reverseDatas
      *
-     * @return object New instance of ReverseRouter
+     * @return ReverseRouter New instance of ReverseRouter
      */
-    public static function getReverseRouter(array $reverseDatas): object
+    public static function getReverseRouter(array $reverseDatas): ReverseRouter
     {
         return new ReverseRouter(self::getReverseFunction(), $reverseDatas);
     }
@@ -92,7 +92,7 @@ class Std extends RouteParserStd
     public static function getReverseFunction(): callable
     {
         return
-        function (array $reverse, ...$params): string 
+        function (array $reverse, ?array ...$params): string 
         {
             //if (!$reverse) { throw new RuntimeException('Bad argument type.'); }
             $vars = [];
