@@ -14,7 +14,11 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
     protected $currentRouteId;
     protected $routeIdPrefix = 'route_';
     protected $routeIdCount = 0;
-    
+
+    protected $currentGroupId;
+    protected $groupIdPrefix = 'group_';
+    protected $groupIdCount = 0;
+
     /**
      * Routes Data.
      *
@@ -35,11 +39,12 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
     public function getData(): array
     {
         $routes_data = $this->dataGenerator->getData();
+        /*
         var_dump('**********$_routes_data******************');
         echo '<pre>';
         print_r($routes_data);
         echo '</pre>';
-
+        */
         $routes_data['routes_data'] = $this->routesData;
         
         return $routes_data;
@@ -70,10 +75,23 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
         $previousGroupPrefix = $this->currentGroupPrefix;
         $this->currentGroupPrefix = $previousGroupPrefix . $prefix;
 
-        $callback($collector);
+        if ($prefix) { 
+            $previousGroupId = $this->currentGroupId;
 
+            $this->currentGroupId = $this->groupIdPrefix .$this->groupIdCount++;
+
+            $group_data = $this->routeParser->parse($prefix);
+
+            $this->dataGenerator->addGroup($group_data, $this->currentGroupId, $previousGroupId);
+        }
+
+        $callback($collector);
+        
+        if ($prefix) { 
+            $this->currentGroupId = $previousGroupId;
+        }
+        
         $this->currentGroupPrefix = $previousGroupPrefix;
- 
         $this->currentGroupName = $previousGroupName;
     }
 
@@ -86,7 +104,7 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      */
     public function addRoute($httpMethod, $route, $handler): void
     {
-        $this->currentRouteId = $this->routeIdPrefix.$this->routeIdCount++;
+        $this->currentRouteId = $this->routeIdPrefix . $this->routeIdCount ++;
         $route_name = '';
 
         if ($this->currentGroupName) {
@@ -100,12 +118,14 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
         }
 
         $currentRoute = $this->currentGroupPrefix . $route;
-
+       
         $route_data = $this->routeParser->parse($currentRoute);
 
-        $this->dataGenerator->addRoute($httpMethod, $route_data, $this->currentRouteId);
+        $this->dataGenerator->addRoute($httpMethod, $route_data, $this->currentRouteId, $this->currentGroupId);
 
+        /** PARSE REVERSE */
         if ($route_name && method_exists($this->routeParser, 'parseReverse')) {
+
             if (isset($this->routesData['reverse']) &&
                 \in_array($route_name, $this->routesData['reverse'], true)
             ) {

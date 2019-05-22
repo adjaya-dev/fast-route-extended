@@ -141,11 +141,14 @@ class HandlingProvider implements HandlingProviderInterface
 
     public function processAddons(array & $routesData): void
     {
-        echo '*********processAddons***********<br>';
+        /*
+        var_dump('process addons');
         echo '<pre>';
         print_r($this->routesAddonsData);
         echo '</pre>';
+        */
         $this->_processAddons($this->routesAddonsData, $routesData);
+        
     }
 
     /**

@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\DataGenerator;
 
+use Adjaya\FastRoute\Group;
 use FastRoute\BadRouteException;
 use FastRoute\DataGenerator;
-use FastRoute\Route;
+use Adjaya\FastRoute\Route;
 
 abstract class RegexBasedAbstract implements DataGenerator
 {
+    protected $groupsStack = [];
+
     /** @var mixed[][] */
     protected $staticRoutes = [];
     
-    /** @var Route[][] */
+    /** @var mixed[][] */
     protected $methodToRegexToRoutesMap = [];
     
     /**
@@ -26,12 +29,61 @@ abstract class RegexBasedAbstract implements DataGenerator
      */
     abstract protected function processChunk($regexToRoutesMap);
 
-    public function addRoute($httpMethod, $routeData, $routeId) 
+    public function addGroup($groupData, $groupId, $parentGroupId) 
     {
-        if ($this->isStaticRoute($routeData)) {
+        list($groupRegex, $groupVariables) = $this->buildRegexForGroup($groupData);
+
+        $mergedRegex = (array) $groupRegex;
+        $mergedVariables = $groupVariables;
+
+        if ($parentGroupId) { 
+            $parentGroup = $this->groupsStack[$parentGroupId];
+            $parentsRegex = $parentGroup->regexMergedWithParents;
+            $parentsVariables = $parentGroup->variablesMergedWithParents;
+
+            $mergedRegex = array_merge($parentsRegex, (array) $groupRegex);
+            $mergedVariables = array_merge($parentsVariables, $groupVariables);
+        }
+
+        $this->groupsStack[$groupId] = new Group(
+            $groupId, $groupRegex, $groupVariables, $parentGroupId, $mergedRegex, $mergedVariables
+        );
+    }
+    // pas utilisé
+    public function getGroupData($groupId) {
+        return $this->groupsStack[$groupId]->getMergedData();
+    }
+
+    public function addRoute($httpMethod, $routeData, $routeId, $groupId = null) 
+    {
+        if ($this->isStatic($routeData)) {
             $this->addStaticRoute($httpMethod, $routeData, $routeId);
         } else {
-            $this->addVariableRoute($httpMethod, $routeData, $routeId);
+            $this->addVariableRoute($httpMethod, $routeData, $routeId, $groupId);
+        }
+    }
+
+    protected function addVariableRoute($httpMethod, $routeData, $routeId, $groupId)
+    {
+        list($route_regex, $variables) = $this->buildRegexForRoute($routeData);
+
+        $route_regex_string = $route_regex;
+
+        $group_regex_array = [];
+
+        if ($groupId) {
+            $group_regex_array = $this->groupsStack[$groupId]->regexMergedWithParents;
+            $group_regex_string = implode($group_regex_array);
+            // On cherche la regex de la route sans la regex du group :
+            $route_regex_string = str_replace($group_regex_string, '', $route_regex_string);
+        }
+
+        // Allow Multiple routes matching same regex
+        foreach((array) $httpMethod as $method) 
+        {
+            $this->methodToRegexToRoutesMap[$method][$route_regex][] = new Route( 
+                $method, $routeId, $route_regex_string, $variables, $groupId, $group_regex_array
+            );
         }
     }
 
@@ -39,7 +91,7 @@ abstract class RegexBasedAbstract implements DataGenerator
      * @param mixed[]
      * @return bool
      */
-    protected function isStaticRoute($routeData) 
+    protected function isStatic($routeData) 
     {
         return count($routeData) === 1 && count($routeData[0]) === 1 && is_string($routeData[0][0]);    
     }
@@ -69,16 +121,14 @@ abstract class RegexBasedAbstract implements DataGenerator
         } 
     }
 
-    private function addVariableRoute($httpMethod, $routeData, $routeId)
+    protected function buildRegexForGroup($groupData)
     {
-        list($regex, $variables) = $this->buildRegexForRoute($routeData);
-
-        // Allow Multiple routes matching same regex
-        foreach((array) $httpMethod as $method) {
-            $this->methodToRegexToRoutesMap[$method][$regex][] = new Route(
-                $method, $routeId, $regex, $variables
-            );
+        if (count($groupData) !== 1) {
+            throw new BadRouteException(
+                'Cannot use optional placeholder in a group prefix');       
         }
+
+        return $this->buildRegex($groupData);
     }
 
     /**
@@ -99,10 +149,19 @@ abstract class RegexBasedAbstract implements DataGenerator
                 str_repeat($reg_optional_close_f, $count_optional);
         }
 
+        list($regex, $variables) = $this->buildRegex($routeData);
+
+        $regex = vsprintf($reg_f, $regex);
+
+        return [$regex, $variables];
+    }
+
+    protected function buildRegex($data) 
+    {
         $regex = [];
         $variables = [];
-        
-        foreach ($routeData as $i => $segments) 
+   
+        foreach ($data as $i => $segments) 
         {
             $regex[$i] = '';
             foreach ($segments as $segment) {
@@ -132,8 +191,6 @@ abstract class RegexBasedAbstract implements DataGenerator
             }
         }
 
-        $regex = vsprintf($reg_f, $regex);
-
         return [$regex, $variables];
     }
 
@@ -155,10 +212,12 @@ abstract class RegexBasedAbstract implements DataGenerator
     private function generateVariableRouteData()
     {
         $data = [];
+    
         foreach ($this->methodToRegexToRoutesMap as $method => $regexToRoutesMap) {
             $chunkSize = $this->computeChunkSize(count($regexToRoutesMap));
             $chunks = array_chunk($regexToRoutesMap, $chunkSize, true);
-            $data[$method] = array_map([$this, 'processChunk'], $chunks);
+            $data[$method] = array_map([$this, 'processChunk'], $chunks); // nouvelle methode
+            //$data[$method] = array_map([$this, '_processChunk'], $chunks); // ancienne methode
         }
         return $data;
     }
