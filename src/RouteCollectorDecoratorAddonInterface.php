@@ -27,4 +27,6 @@ interface RouteCollectorDecoratorAddonInterface
     public function patch($route, $handler): HandlingInterface;
 
     public function head($route, $handler): HandlingInterface;
+
+    public function any($route, $handler): HandlingInterface;
 }

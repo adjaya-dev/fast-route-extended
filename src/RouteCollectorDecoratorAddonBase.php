@@ -82,5 +82,9 @@ class RouteCollectorDecoratorAddonBase implements RouteCollectorDecoratorAddonIn
 
     public function head($route, $handler): HandlingInterface {
         return $this->addRoute('HEAD', $route, $handler);
-    }   
+    }
+    
+    public function any($route, $handler): HandlingInterface {
+        return $this->addRoute('*', $route, $handler);
+    }
 }

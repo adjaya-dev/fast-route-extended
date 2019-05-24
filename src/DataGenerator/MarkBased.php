@@ -6,14 +6,12 @@ namespace Adjaya\FastRoute\DataGenerator;
 
 class MarkBased extends RegexBasedAbstract
 {
-    protected $regex = '';
-
-    protected function getApproxChunkSize()
+    protected function getApproxChunkSize(): int
     {
         return 30;
     }
 
-    protected function processChunk($regexToRoutesMap)
+    protected function processChunk(array $regexToRoutesMap): array
     {
         $routeMap = [];
         $regexes = [];
@@ -51,12 +49,12 @@ class MarkBased extends RegexBasedAbstract
         return ['regex' => $regex, 'routeMap' => $routeMap];
     }
 
-    protected function regexToString($regex_map) 
+    protected function regexToString(array $regex_map): string 
     {
         $regex = '';
 
         foreach ($regex_map as $k => $m) {
-            if (is_string($k)) { // group
+            if (is_string($k) && is_array($m)) { // group
                 $regex .= sprintf("|$k(?%s)", $this->regexToString($m));
             } else { // route
                 $regex .= '|'.$m;

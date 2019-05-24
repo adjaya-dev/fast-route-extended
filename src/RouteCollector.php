@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Adjaya\FastRoute;
 
 use Exception;
-use FastRoute\Datagenerator;
+use Adjaya\FastRoute\Datagenerator;
 use FastRoute\RouteCollector as FastRouteCollector;
 use FastRoute\RouteParser;
 
@@ -30,6 +30,19 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
      * @var string
      */
     protected $currentGroupName;
+
+    /**
+     * Constructs a route collector.
+     *
+     * @param RouteParser   $routeParser
+     * @param DataGenerator $dataGenerator
+     */
+    public function __construct(RouteParser $routeParser, DataGenerator $dataGenerator)
+    {
+        $this->routeParser = $routeParser;
+        $this->dataGenerator = $dataGenerator;
+        $this->currentGroupPrefix = '';
+    }
 
     /**
      * {@inheritdoc}
@@ -146,5 +159,10 @@ class RouteCollector extends FastRouteCollector implements RouteCollectorInterfa
     public function getCurrentRouteId(): string 
     {
         return $this->currentRouteId;
+    }
+
+    public function any($route, $handler)
+    {
+        $this->addRoute('*', $route, $handler);
     }
 }

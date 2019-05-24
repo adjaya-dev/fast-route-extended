@@ -205,8 +205,14 @@ class Router
         $options = $this->options;
 
         /** @var RouteCollector $routeCollector */
+        $DataGenerator = new $options['dataGenerator']();
+
+        if (isset($options['router']['allowIdenticalRegexRoutes']) && !$options['router']['allowIdenticalRegexRoutes']) {
+            $DataGenerator->allowIdenticalsRegexRoutes(false);
+        }
+
         $routeCollector = new $options['routeCollector'](
-            new $options['routeParser'](), new $options['dataGenerator']()
+            new $options['routeParser'](), $DataGenerator
         );
 
         if (isset($options['routeCollectorDecorators'])) {

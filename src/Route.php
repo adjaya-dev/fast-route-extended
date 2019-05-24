@@ -1,36 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adjaya\FastRoute;
 
 class Route
 {
-    /** @var string */
+    /** 
+     * @var string|array 
+     */
     public $httpMethod;
 
-    /** @var string */
+    /** 
+     * @var string 
+     */
     public $regex;
 
-    /** @var array */
+    /** 
+     * @var array 
+     */
     public $variables;
 
-    /** @var string */
+    /** 
+     * @var string 
+     */
     public $id;
 
-    /** @var string */
+    /** 
+     * @var string|null 
+     */
     public $groupId;
 
-    /** @var array */
+    /**
+     *  @var array 
+     */
     public $prefixRegex;
-
+    
     /**
      * Constructs a route (value object).
      *
-     * @param string $httpMethod
-     * @param mixed  $handler
-     * @param string $regex
-     * @param array  $variables
+     * @param   string|array $httpMethod
+     * @param   string       $routeId
+     * @param   string       $regex
+     * @param   array        $variables
+     * @param   string|null  $groupId
+     * @param   array        $prefixRegex
      */
-    public function __construct($httpMethod, $routeId, $regex, $variables, $groupId, $prefixRegex)
+    public function __construct(
+        $httpMethod, string $routeId, string $regex, array $variables, ?string $groupId, array $prefixRegex
+    )
     {
         $this->httpMethod = $httpMethod;
         $this->id = $routeId;
@@ -47,9 +65,9 @@ class Route
      *
      * @return bool
      */
-    public function matches($str)
+    public function matches(string $str): bool
     {
-        $regex = '~^' . $this->regex . '$~';
+        $regex = '~^' . implode($this->prefixRegex) . $this->regex . '$~';
         return (bool) preg_match($regex, $str);
     }
 }

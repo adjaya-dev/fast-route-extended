@@ -24,5 +24,7 @@ interface RouteCollectorInterface
 
     public function head($route, $handler);
 
+    public function any($route, $handler);
+
     public function getCurrentRouteId(): string;
 }
