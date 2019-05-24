@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
+use Adjaya\FastRoute\Addon\RouteCollectorDecoratorAddonInterface;
 use Adjaya\FastRoute\DataGenerator\DataGeneratorInterface;
 use Adjaya\FastRoute\RouteParser\RouteParserInterface;
 use Exception;

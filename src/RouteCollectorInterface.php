@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
+use Adjaya\FastRoute\Addon\RouteCollectorDecoratorAddonInterface;
+
 interface RouteCollectorInterface
 {
     public function getData(): array;
@@ -11,6 +13,8 @@ interface RouteCollectorInterface
     public function addGroup($prefix, callable $callback, RouteCollectorDecoratorAddonInterface $collector = null);
 
     public function addRoute($httpMethod, $route, $handler);
+
+    public function getCurrentRouteId(): string;
 
     public function get($route, $handler);
 
@@ -25,6 +29,4 @@ interface RouteCollectorInterface
     public function head($route, $handler);
 
     public function any($route, $handler);
-
-    public function getCurrentRouteId(): string;
 }

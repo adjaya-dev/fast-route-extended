@@ -39,20 +39,20 @@ class Router
         'cacheDisabled'  => false,
         //'addonDisabled' =>  true,
         'routeCollectorDecorators' => [
-            'Adjaya\\FastRoute\\RouteCollectorDecoratorAddon' => 
+            'Adjaya\\FastRoute\\Addon\\RouteCollectorDecoratorAddon' => 
             [
                 'enabled' => true,
                 'options' => [
-                    'handlingProvider' => "Adjaya\\FastRoute\\HandlingProvider",
+                    'handlingProvider' => "Adjaya\\FastRoute\\Handling\\HandlingProvider",
                     'handlindProviderDecorators' => [
-                        "Adjaya\\FastRoute\\HandlingProviderDecoratorMacroable" => [
+                        "Adjaya\\FastRoute\\Handling\\HandlingProviderDecoratorMacroable" => [
                             'macros' => [
                             ],
                             'addons' => [
                                 'route' => [],
                             ],
                         ],
-                        //"Adjaya\\FastRoute\\HandlingProviderDecoratorBase" => [],   
+                        //"Adjaya\\FastRoute\\Handling\\HandlingProviderDecoratorBase" => [],   
                     ],
                 ],
                 'addons' => [
