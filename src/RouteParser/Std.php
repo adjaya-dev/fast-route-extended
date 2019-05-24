@@ -4,13 +4,23 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\RouteParser;
 
-use FastRoute\RouteParser\Std as RouteParserStd;
 use Adjaya\FastRoute\ReverseRouter;
 use LogicException;
 use RuntimeException;
 
-class Std extends RouteParserStd
+class Std implements RouteParserInterface
 {
+    const VARIABLE_REGEX = <<<'REGEX'
+\{
+    \s* ([a-zA-Z_][a-zA-Z0-9_-]*) \s*
+    (?:
+        : \s* ([^{}]*(?:\{(?-1)\}[^{}]*)*)
+    )?
+\}
+REGEX;
+
+    const DEFAULT_DISPATCH_REGEX = '[^/]+';
+
     public function parse($route)
     {
         $routeWithoutClosingOptionals = rtrim($route, ']');

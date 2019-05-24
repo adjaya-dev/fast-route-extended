@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\DataGenerator;
 
-use Adjaya\FastRoute\DataGenerator;
 use Adjaya\FastRoute\Group;
-use FastRoute\BadRouteException;
+use Adjaya\FastRoute\Exception\BadRouteException;
 use Adjaya\FastRoute\Route;
 
-abstract class RegexBasedAbstract implements DataGenerator
+abstract class RegexBasedAbstract implements DataGeneratorInterface
 {
     protected $identicalsRegexRoutes = true;
 
