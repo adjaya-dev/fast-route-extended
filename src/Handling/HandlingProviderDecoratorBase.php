@@ -20,7 +20,7 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
 
     public function setRouteHandlingDecorator(string $routeHandlingDecoratorClass): void
     {
-        $this->HandlingProvider->setRouteHandlingDecorator($routeHanlingDecoratorClass);
+        $this->HandlingProvider->setRouteHandlingDecorator($routeHandlingDecoratorClass);
     }
 
     public function setGroupHandlingDecorator(string $groupHandlingDecoratorClass): void

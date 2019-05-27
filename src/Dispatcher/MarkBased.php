@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Adjaya\FastRoute\Dispatcher;
 
 class MarkBased extends RegexBasedAbstract

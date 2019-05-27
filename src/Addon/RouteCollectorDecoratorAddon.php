@@ -68,7 +68,6 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
         }
 
         $this->HandlingProvider = $HandlingProvider;
-
     }
     
     public function getData(): array

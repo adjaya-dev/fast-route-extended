@@ -9,44 +9,45 @@ class Handling extends AbstractHandling implements HandlingInterface
     /**
      * @var array
      */
-    protected $registeredAddons;
+    private $registeredAddons;
 
     /**
      * @var string
      */
-    protected $id = null;
+    private $id = null;
 
     /**
      * @var array|null
      */
-    protected $addons;
+    private $addons;
 
-    protected $ChildHandling;
+    private $ChildHandling;
 
     public function __construct(?array $addons = [])
     {
         $this->registerAddons($addons);
     }
 
-    public function __call($method, $parameters): HandlingInterface
+    public function getId(): ?string 
     {
-        if (method_exists($this, $method)) {
-            call_user_func_array(array($this, $method), $parameters);
-
-            return $this->getChild();
-        }
-
-        throw new \BadMethodCallException("Method {$method} does not exist.");
+        return $this->id;
     }
-    
-    public static function __callStatic($method, $parameters): \BadMethodCallException
+
+    public function getRegisteredAddons(): array 
     {
-        throw new \BadMethodCallException("Method __callStatic is not allowed, can't call {$method}");
+        return $this->registeredAddons;
+    }
+
+    public function getAddons(): array 
+    {
+        return $this->addons;
     }
 
     public function setChild(HandlingInterface $child): void 
     {
-        $this->ChildHandling = $child;
+        if (!$this->ChildHandling) {
+            $this->ChildHandling = $child;
+        }
     }
 
     public function getChild(): HandlingInterface 

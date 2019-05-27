@@ -13,7 +13,7 @@ class HandlingDecoratorMacro extends HandlingDecoratorBase
         //__callStatic as callStatic;
     }
     
-    public function __call($method, $parameters): HandlingInterface
+    public function __call($method, $parameters)
     {
         if (static::hasMacro($method)) {
             $this->call($method, $parameters);

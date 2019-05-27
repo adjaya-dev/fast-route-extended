@@ -148,7 +148,6 @@ class HandlingProvider implements HandlingProviderInterface
         echo '</pre>';
         */
         $this->_processAddons($this->routesAddonsData, $routesData);
-        
     }
 
     /**

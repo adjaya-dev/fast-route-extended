@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-interface HandlingDecoratorInterface extends HandlingInterface 
-{
+use BadMethodCallException;
 
+interface HandlingDecoratorInterface extends HandlingInterface
+{
+    public function __call(string $method, array $parameters);
+
+    public static function __callStatic($method, $parameters): BadMethodCallException;
 }

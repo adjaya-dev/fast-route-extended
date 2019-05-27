@@ -7,6 +7,7 @@ namespace Adjaya\FastRoute\DataGenerator;
 use Adjaya\FastRoute\Group;
 use Adjaya\FastRoute\Exception\BadRouteException;
 use Adjaya\FastRoute\Route;
+use Exception;
 
 abstract class RegexBasedAbstract implements DataGeneratorInterface
 {
@@ -56,7 +57,6 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         );
     }
     
-    // pas utilisé
     public function getGroupData(string $groupId): array 
     {
         return $this->groupsStack[$groupId]->getMergedData();
@@ -90,7 +90,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
                 isset($this->staticRoutes[$method][$routeStr])
             ) 
             {
-                throw new \Exception('
+                throw new Exception('
                     Identicals regular expressions for multiple routes are not allowed.
                     You can set this option to true if you want, 
                     see function allowIdenticalsRegexRoutes(bool $allow = true).
@@ -124,7 +124,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
                 isset($this->methodToRegexToRoutesMap[$method][$route_regex])
             )
             {
-                throw new \Exception('
+                throw new Exception('
                     Identicals regular expressions for multiple routes are not allowed.
                     You can set this option to true if you want, 
                     see function allowIdenticalsRegexRoutes(bool $allow = true).

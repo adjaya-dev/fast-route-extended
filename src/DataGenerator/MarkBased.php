@@ -86,5 +86,4 @@ class MarkBased extends RegexBasedAbstract
         $regex = '~^(?|' . implode('|', $regexes) . ')$~';
         return ['regex' => $regex, 'routeMap' => $routeMap];
     }
-    
 }

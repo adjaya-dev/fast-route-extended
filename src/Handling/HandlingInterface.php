@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-use BadMethodCallException;
-
 interface HandlingInterface 
 {
-    public function __call($method, $parameters): HandlingInterface;
-
-    public static function __callStatic($method, $parameters): BadMethodCallException;
+    public function getChild(): HandlingInterface;
 
     public function add(array $addons): HandlingInterface;
 }
