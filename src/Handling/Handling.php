@@ -47,13 +47,11 @@ class Handling extends AbstractHandling implements HandlingInterface
 
     public function setChild(HandlingInterface $child): void 
     {
-        
         if ($this->ChildHandling) {
             throw new Exception(
                 "Child Handling is already set."
             );
         }
-        
 
         $this->ChildHandling = $child;
     }

@@ -146,6 +146,7 @@ class HandlingProvider implements HandlingProviderInterface
         print_r($this->routesAddonsData);
         echo '</pre>';
         */
+        
         $this->_processAddons($this->routesAddonsData, $routesData);
     }
 
@@ -223,22 +224,22 @@ class HandlingProvider implements HandlingProviderInterface
                 new ReflectionMethod($this->_Handling['group'], 'setHandlers');
 
             $this->setGroupHandlers->setAccessible(true);
-
-            $this->GroupHandling = $O_GroupHandling =
-            new $this->_Handling['group']($this->registeredAddons['group']);
+        }
     
-            if (!empty($this->GroupHandlingDecorator))
-            {
-                foreach ($this->GroupHandlingDecorator as $decorator) 
-                {
-                    $this->GroupHandling = new $decorator($this->GroupHandling);
-                }
-            }
+        $this->GroupHandling = $O_GroupHandling =
+        new $this->_Handling['group']($this->registeredAddons['group']);
 
-            $O_GroupHandling->setChild($this->GroupHandling);
+        if (!empty($this->GroupHandlingDecorator))
+        {
+            foreach ($this->GroupHandlingDecorator as $decorator) 
+            {
+                $this->GroupHandling = new $decorator($this->GroupHandling);
+            }
         }
 
-        return clone $this->GroupHandling;
+        $O_GroupHandling->setChild($this->GroupHandling);
+
+        return $this->GroupHandling;
     }
 
     /**
