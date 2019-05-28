@@ -51,14 +51,14 @@ class Router
         $this->routeDefinitionCallback = $routeDefinitionCallback;
         if (isset($options['router']))
         {
-            $routerOptions = $this->setRouterOption($options['router']);
+            $routerOptions = $this->setRouterOptions($options['router']);
             $this->options = $routerOptions + $this->options;
         } 
         // TODO
         //$this->options = $options + $this->options;
     }
 
-    protected function setRouterOption($options) 
+    protected function setRouterOptions($options) 
     {
         $_options = [];
 
@@ -240,10 +240,6 @@ class Router
         $routeCollector = new $options['routeCollector'](
             new $options['routeParser'](), $DataGenerator
         );
-
-        if (isset($options['addons'])) {
-
-        }
 
         if (isset($options['routeCollectorDecorators'])) {
             foreach ($options['routeCollectorDecorators'] as $decorator => $v) {
