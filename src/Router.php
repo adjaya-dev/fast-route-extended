@@ -27,43 +27,21 @@ class Router
      */
     protected $routeDefinitionCallback;
 
-    /**
-     * @var array
-     */
     protected $options =
     [
-        'routeParser' =>    'Adjaya\\FastRoute\\RouteParser\\Std',
-        'dataGenerator' =>  'Adjaya\\FastRoute\\DataGenerator\\MarkBased',
-        'dispatcher' =>     'Adjaya\\FastRoute\\Dispatcher\\MarkBased',
-        'routeCollector' => 'Adjaya\\FastRoute\\RouteCollector',
+        'router' => [],
+        'routeParser' =>    \Adjaya\FastRoute\RouteParser\Std::class,
+        'dataGenerator' =>  \Adjaya\FastRoute\DataGenerator\MarkBased::class,
+        'dispatcher' =>     \Adjaya\FastRoute\Dispatcher\MarkBased::class,
+        'routeCollector' => \Adjaya\FastRoute\RouteCollector::class,
+
+        'handlingProvider' => \Adjaya\FastRoute\Handling\HandlingProvider::class,
+        'addon' => \Adjaya\FastRoute\Addon\RouteCollectorDecoratorAddon::class,
+        'macro' => \Adjaya\FastRoute\Handling\HandlingProviderDecoratorMacroable::class,
+
         'cacheDisabled'  => false,
-        //'addonDisabled' =>  true,
-        'routeCollectorDecorators' => [
-            'Adjaya\\FastRoute\\Addon\\RouteCollectorDecoratorAddon' => 
-            [
-                'enabled' => true,
-                'options' => [
-                    'handlingProvider' => "Adjaya\\FastRoute\\Handling\\HandlingProvider",
-                    'handlindProviderDecorators' => [
-                        "Adjaya\\FastRoute\\Handling\\HandlingProviderDecoratorMacroable" => [
-                            'macros' => [
-                            ],
-                            'addons' => [
-                                'route' => [],
-                            ],
-                        ],
-                        //"Adjaya\\FastRoute\\Handling\\HandlingProviderDecoratorBase" => [],   
-                    ],
-                ],
-                'addons' => [
-                  'global' => [
-                  ],
-                  'route' => [
-                  ],
-                ],
-            ],
-        ],
     ];
+
     /**
      * @param callable $routeDefinitionCallback
      * @param array    $options
@@ -71,7 +49,55 @@ class Router
     public function __construct(callable $routeDefinitionCallback, $options = [])
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;
-        $this->options = $options + $this->options;
+        if (isset($options['router']))
+        {
+            $routerOptions = $this->setRouterOption($options['router']);
+            $this->options = $routerOptions + $this->options;
+        } 
+        // TODO
+        //$this->options = $options + $this->options;
+    }
+
+    protected function setRouterOption($options) 
+    {
+        $_options = [];
+
+        if (isset($options['addons']) || isset($options['macros'])) {
+            $_options['routeCollectorDecorators'][$this->options['addon']] = [
+                'enabled' => true,
+                'options' => [
+                    'handlingProvider' =>
+                    $this->options['handlingProvider'],
+                ], 
+            ];
+        }
+
+        if (isset($options['addons'])) {
+            $_options['routeCollectorDecorators'][$this->options['addon']]['options']['addons'] = $options['addons'];
+        }
+
+        if (isset($options['macros'])) {
+            $_options['routeCollectorDecorators'][$this->options['addon']]['options']['handlindProviderDecorators'] = [
+                $this->options['macro'] => $options['macros'],
+            ];
+        }
+
+        if (isset($options['cacheFile'])) {
+            $_options['cacheFile'] = $options['cacheFile'];
+        }
+
+        if (isset($options['cacheDisabled'])) {
+            $_options['cacheDisabled'] = $options['cacheDisabled'];
+        }
+
+        /*
+        var_dump('******** ROUTER OPTIONS **********');
+        echo '<pre>';
+        print_r($_options);
+        echo '</pre>';
+        */
+
+        return $_options;
     }
 
     public function getCachedRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
@@ -214,6 +240,10 @@ class Router
         $routeCollector = new $options['routeCollector'](
             new $options['routeParser'](), $DataGenerator
         );
+
+        if (isset($options['addons'])) {
+
+        }
 
         if (isset($options['routeCollectorDecorators'])) {
             foreach ($options['routeCollectorDecorators'] as $decorator => $v) {
