@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-use Exception;
 use ReflectionMethod;
 
 class HandlingProvider implements HandlingProviderInterface
@@ -189,13 +188,25 @@ class HandlingProvider implements HandlingProviderInterface
      */
     protected function getRouteHandling(): HandlingInterface
     {
-        if (!$this->RouteHandling) {
+        if (!$this->RouteHandling) 
+        {
             $this->setRouteHandlers =
                 new ReflectionMethod($this->_Handling['route'], 'setHandlers');
+
             $this->setRouteHandlers->setAccessible(true);
 
-            $this->RouteHandling =
+            $this->RouteHandling = $O_RouteHandling =
                 new $this->_Handling['route']($this->registeredAddons['route']);
+
+            if (!empty($this->RouteHandlingDecorator))
+            {
+                foreach ($this->RouteHandlingDecorator as $decorator) 
+                {
+                    $this->RouteHandling = new $decorator($this->RouteHandling);
+                }
+            }
+            
+            $O_RouteHandling->setChild($this->RouteHandling);
         }
 
         return $this->RouteHandling;
@@ -206,16 +217,28 @@ class HandlingProvider implements HandlingProviderInterface
      */
     protected function getGroupHandling(): HandlingInterface
     {
-        if (!$this->GroupHandling) {
+        if (!$this->GroupHandling) 
+        {
             $this->setGroupHandlers =
                 new ReflectionMethod($this->_Handling['group'], 'setHandlers');
+
             $this->setGroupHandlers->setAccessible(true);
+
+            $this->GroupHandling = $O_GroupHandling =
+            new $this->_Handling['group']($this->registeredAddons['group']);
+    
+            if (!empty($this->GroupHandlingDecorator))
+            {
+                foreach ($this->GroupHandlingDecorator as $decorator) 
+                {
+                    $this->GroupHandling = new $decorator($this->GroupHandling);
+                }
+            }
+
+            $O_GroupHandling->setChild($this->GroupHandling);
         }
 
-        $this->GroupHandling =
-        new $this->_Handling['group']($this->registeredAddons['group']);
-
-        return $this->GroupHandling;
+        return clone $this->GroupHandling;
     }
 
     /**
@@ -233,8 +256,15 @@ class HandlingProvider implements HandlingProviderInterface
      * @return HandlingInterface $RouteHandling
      */
     public function afterAddRoute(
-        HandlingInterface $O_RouteHandling, string $route_id): HandlingInterface
+        HandlingInterface $RouteHandling, string $route_id): HandlingInterface
     {
+        $O_RouteHandling = $RouteHandling;
+
+        if ($RouteHandling instanceof HandlingDecoratorInterface)
+        {
+            $O_RouteHandling = $RouteHandling->getOriginalHandling();
+        }
+
         $this->setRouteHandlers->invokeArgs(
             $O_RouteHandling,
             [
@@ -242,25 +272,8 @@ class HandlingProvider implements HandlingProviderInterface
                 $route_id
             ]
         );
-
-        $i = 0;
-        if (!empty($this->RouteHandlingDecorator))
-        {
-            foreach ($this->RouteHandlingDecorator as $decorator) {
-                if ($i === 0) {
-                    $RouteHandling = new $decorator($O_RouteHandling);
-                    $i++;
-                }
-
-                $RouteHandling = new $decorator($RouteHandling);
-            }
-        } else {
-            $RouteHandling = $O_RouteHandling;
-        } 
        
-       $O_RouteHandling->setChild($RouteHandling);
-        
-       return $RouteHandling;
+        return $RouteHandling;
     }
 
     /**
@@ -273,9 +286,14 @@ class HandlingProvider implements HandlingProviderInterface
         $this->routesAddonsDataCurrentIndex =
         & $this->routesAddonsDataCurrentIndex[];
 
-        $O_GroupHandling = $this->getGroupHandling();
-
         $previousIndex = & $this->groupsAddonsDataPreviousIndex();
+
+        $O_GroupHandling = $GroupHandling = $this->getGroupHandling();
+
+        if ($GroupHandling instanceof HandlingDecoratorInterface)
+        {
+            $O_GroupHandling = $GroupHandling->getOriginalHandling();
+        }
 
         $this->setGroupHandlers->invokeArgs(
             $O_GroupHandling,
@@ -284,24 +302,6 @@ class HandlingProvider implements HandlingProviderInterface
             ]
         );
 
-        $i = 0;
-        if (!empty($this->GroupHandlingDecorator))
-        {
-            foreach ($this->GroupHandlingDecorator as $decorator) 
-            {
-                if ($i === 0) {
-                    $GroupHandling = new $decorator($O_GroupHandling);
-                    $i++;
-                }
-
-                $GroupHandling = new $decorator($GroupHandling);
-            }
-        } else {
-            $GroupHandling = $O_GroupHandling;
-        }
-
-        $O_GroupHandling->setChild($GroupHandling);
-        
         $previousIndex[spl_object_id($GroupHandling)] = & $previousIdx;
 
         return $GroupHandling;

@@ -12,7 +12,7 @@ abstract class AbstractHandling
 
     abstract public function getRegisteredAddons(): array;
 
-    abstract public function getAddons(): array;
+    abstract public function getAddons(): ?array;
 
     abstract public function setChild(HandlingInterface $child): void; 
     

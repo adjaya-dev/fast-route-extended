@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
+use Exception;
+
 class Handling extends AbstractHandling implements HandlingInterface
 {
     /**
@@ -38,16 +40,22 @@ class Handling extends AbstractHandling implements HandlingInterface
         return $this->registeredAddons;
     }
 
-    public function getAddons(): array 
+    public function getAddons(): ?array 
     {
         return $this->addons;
     }
 
     public function setChild(HandlingInterface $child): void 
     {
-        if (!$this->ChildHandling) {
-            $this->ChildHandling = $child;
+        
+        if ($this->ChildHandling) {
+            throw new Exception(
+                "Child Handling is already set."
+            );
         }
+        
+
+        $this->ChildHandling = $child;
     }
 
     public function getChild(): HandlingInterface 

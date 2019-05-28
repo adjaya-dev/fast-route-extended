@@ -23,6 +23,17 @@ class HandlingDecoratorBase implements HandlingDecoratorInterface
         return $this->Handling->getChild();
     }
 
+    public function getOriginalHandling(): HandlingInterface
+    {
+        $handling = $this->Handling;
+
+        while ($handling instanceof HandlingDecoratorInterface) {
+            $handling = $handling->getOriginalHandling();
+        }
+        
+        return $handling;
+    }
+
     public function __call(string $method, array $parameters)
     {
         return call_user_func_array(array($this->Handling, $method), $parameters);
