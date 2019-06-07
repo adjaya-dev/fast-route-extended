@@ -8,46 +8,24 @@ use Exception;
 
 class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 {
-    /**
-     * HandlingDecoratorInterface
-     */
-    protected $RouteHandlingDecoratorMacro;
-
-    /**
-     * HandlingDecoratorInterface
-     */
-    protected $GroupHandlingDecoratorMacro;
-
     public function __construct(HandlingProviderInterface $HandlingProvider, array $options)
     {
         $this->HandlingProvider = $HandlingProvider;
-        
-        $this->RouteHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
-            $this->HandlingProvider->setRouteHandlingDecorator($this->RouteHandlingDecoratorMacro);
 
-        $this->GroupHandlingDecoratorMacro = get_class($this->getHandlingDecoratorClass());
-            $this->HandlingProvider->setGroupHandlingDecorator($this->GroupHandlingDecoratorMacro);
+        $this->HandlingProvider->setRouteHandlingDecorator(RouteHandlingDecoratorMacro::class);
+
+        $this->HandlingProvider->setGroupHandlingDecorator(GroupHandlingDecoratorMacro::class);
 
         $this->builtAddonsMacros($this->getRegisteredAddons());
 
         $this->setOptions($options);
     }
 
-    protected function getHandlingDecoratorClass(): HandlingDecoratorInterface
+    protected function setOptions(array $macros): void
     {
-        return new class(new Handling()) extends HandlingDecoratorMacro {};
-    }
-
-    protected function setOptions(array $options): void
-    {
-        if (isset($options['macros']) && !empty($options['macros'])) 
+        if (!empty($macros)) 
         {
-            $this->setMacroables($options['macros']);
-        }
-
-        if (isset($options['addons']) && !empty($options['addons'])) 
-        {
-            $this->HandlingProvider->registerAddons($options['addons']);
+            $this->setMacroables($macros);
         }
     }
 
@@ -58,38 +36,51 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
     {
         foreach ($macroables as $scope => $macros) 
         {
+            if (!in_array($scope, ['global', 'route', 'group'])) {
+                throw new Exception("$scope not exists, must be 'global', 'route', or 'group'"); 
+            }
+
             foreach ($macros as $name => $m) 
             {
-                if (\is_callable($m)) {
-                    if ('global' === $scope || 'route' === $scope) {
-                        $this->RouteHandlingDecoratorMacro::macro($name, $m);
-                    } 
-
-                    if ('global' === $scope || 'group' === $scope) {
-                        $this->GroupHandlingDecoratorMacro::macro($name, $m);
+                if (\is_callable($m)) 
+                {
+                    if (is_array($m)) {
+                        $m = call_user_func_array($m);
                     }
 
+                    $this->setMacro($scope, $name, $m);
                     continue;
                 }
-                
-                if (!\is_object($m)) {
-                    if (class_exists($m)) {
-                        $m = new $m();
-                    } else {
-                        throw new Exception("Class $m not Found!");
-                    }
+
+                if (\is_string($m) && class_exists($m)) {
+                    $m = new $m();
+                } else {
+                    throw new Exception("Class $m not Found!");
                 }
 
                 if (\is_object($m)) {
-                    if ('global' === $scope || 'route' === $scope) {
-                        $this->RouteHandlingDecoratorMacro::mixin($m);
-                    }
+                    $methods = (new \ReflectionClass($m))->getMethods(
+                        \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED
+                    );
+            
+                    foreach ($methods as $method) {
+                        $method->setAccessible(true);
 
-                    if ('global' === $scope || 'group' === $scope) {
-                        $this->GroupHandlingDecoratorMacro::mixin($m);
+                        $this->setMacro($scope, $method->name, $method->invoke($m)); 
                     }
                 }
             }
+        }
+    }
+
+    protected function setMacro(string $scope, string $name, \Closure $macro): void 
+    {
+        if ('global' === $scope || 'route' === $scope) {
+            RouteHandlingDecoratorMacro::macro($name, $macro);
+        } 
+
+        if ('global' === $scope || 'group' === $scope) {
+            GroupHandlingDecoratorMacro::macro($name, $macro);
         }
     }
 
@@ -107,23 +98,19 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
                 throw new Exception("$scope is not allowed. Allowed : $s.");
             }
 
-            foreach ($addons as $k => $v) 
+            foreach ($addons as $name => $v) 
             {
-                if ($k === $v) {
-                    $callable = function ($args) use ($k) {
-                        $this->add([$k => $args]);
+                if ($name === $v) {
+                    $macro = function ($arg) use ($name) {
+                        $this->add([$name => $arg]);
                     };
                 } else {
-                    $callable = function ($addon, $args) use ($k) {
-                        $this->add([$k => [$addon => $args]]);
+                    $macro = function ($arg1, $arg2) use ($name) {
+                        $this->add([$name => [$arg1 => $arg2]]);
                     };
                 }
 
-                if ($scope === 'route') {
-                    $this->RouteHandlingDecoratorMacro::macro($k, $callable);
-                } elseif ($scope === 'group') {
-                    $this->GroupHandlingDecoratorMacro::macro($k, $callable);
-                }
+                $this->setMacro($scope, $name, $macro);
             }
         }
     }

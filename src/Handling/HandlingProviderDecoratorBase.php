@@ -13,11 +13,6 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
         $this->HandlingProvider = $HandlingProvider;
     }
 
-    public function registerAddons(array $__addons): void 
-    {
-        $this->HandlingProvider->registerAddons($__addons);
-    }
-
     public function setRouteHandlingDecorator(string $routeHandlingDecoratorClass): void
     {
         $this->HandlingProvider->setRouteHandlingDecorator($routeHandlingDecoratorClass);

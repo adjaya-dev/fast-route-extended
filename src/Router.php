@@ -27,77 +27,28 @@ class Router
      */
     protected $routeDefinitionCallback;
 
-    protected $options =
-    [
-        'router' => [],
-        'routeParser' =>    \Adjaya\FastRoute\RouteParser\Std::class,
-        'dataGenerator' =>  \Adjaya\FastRoute\DataGenerator\MarkBased::class,
-        'dispatcher' =>     \Adjaya\FastRoute\Dispatcher\MarkBased::class,
-        'routeCollector' => \Adjaya\FastRoute\RouteCollector::class,
+    protected $routeCollectorFactory;
 
-        'handlingProvider' => \Adjaya\FastRoute\Handling\HandlingProvider::class,
-        'addon' => \Adjaya\FastRoute\Addon\RouteCollectorDecoratorAddon::class,
-        'macro' => \Adjaya\FastRoute\Handling\HandlingProviderDecoratorMacroable::class,
-
-        'cacheDisabled'  => false,
+    protected $options = [
+        'dispatcher'       => Dispatcher\MarkBased::class,
+        'cacheDisabled'    => false,
     ];
 
     /**
      * @param callable $routeDefinitionCallback
      * @param array    $options
      */
-    public function __construct(callable $routeDefinitionCallback, $options = [])
+    public function __construct(
+        callable $routeDefinitionCallback,
+        $routeCollectorFactory,
+        $options = []
+    )
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;
-        if (isset($options['router']))
-        {
-            $routerOptions = $this->setRouterOptions($options['router']);
-            $this->options = $routerOptions + $this->options;
-        } 
-        // TODO
-        //$this->options = $options + $this->options;
-    }
 
-    protected function setRouterOptions($options) 
-    {
-        $_options = [];
+        $this->routeCollectorFactory = $routeCollectorFactory;
 
-        if (isset($options['addons']) || isset($options['macros'])) {
-            $_options['routeCollectorDecorators'][$this->options['addon']] = [
-                'enabled' => true,
-                'options' => [
-                    'handlingProvider' =>
-                    $this->options['handlingProvider'],
-                ], 
-            ];
-        }
-
-        if (isset($options['addons'])) {
-            $_options['routeCollectorDecorators'][$this->options['addon']]['options']['addons'] = $options['addons'];
-        }
-
-        if (isset($options['macros'])) {
-            $_options['routeCollectorDecorators'][$this->options['addon']]['options']['handlindProviderDecorators'] = [
-                $this->options['macro'] => $options['macros'],
-            ];
-        }
-
-        if (isset($options['cacheFile'])) {
-            $_options['cacheFile'] = $options['cacheFile'];
-        }
-
-        if (isset($options['cacheDisabled'])) {
-            $_options['cacheDisabled'] = $options['cacheDisabled'];
-        }
-
-        /*
-        var_dump('******** ROUTER OPTIONS **********');
-        echo '<pre>';
-        print_r($_options);
-        echo '</pre>';
-        */
-
-        return $_options;
+        $this->options = $options + $this->options;
     }
 
     public function getCachedRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
@@ -127,12 +78,7 @@ class Router
     {
         if ($this->dispatcher) {
             $routeInfo = $this->dispatcher->dispatch($method, $path);
-            /*
-            if (isset($routeInfo[1]) && \is_string($routeInfo[1])
-                && $route = $this->getRouteInfo($routeInfo[1])) {
-                $routeInfo[1] = $route;
-            }
-            */
+
             return $routeInfo;
         }
         throw new LogicException('Dispatcher must be set first');
@@ -188,7 +134,7 @@ class Router
     /**
      * @return object [return description]
      */
-    public function getReverseRouter(): ?object
+    public function getReverseRouter(): object
     {
         if (method_exists($this->options['routeParser'], 'getReverseRouter')) 
         {
@@ -228,31 +174,7 @@ class Router
 
     public function simpleRoutes(): array
     {
-        $options = $this->options;
-
-        /** @var RouteCollector $routeCollector */
-        $DataGenerator = new $options['dataGenerator']();
-
-        if (isset($options['router']['allowIdenticalRegexRoutes']) && !$options['router']['allowIdenticalRegexRoutes']) {
-            $DataGenerator->allowIdenticalsRegexRoutes(false);
-        }
-
-        $routeCollector = new $options['routeCollector'](
-            new $options['routeParser'](), $DataGenerator
-        );
-
-        if (isset($options['routeCollectorDecorators'])) {
-            foreach ($options['routeCollectorDecorators'] as $decorator => $v) {
-                $v = (array) $v;
-                if (isset($v['enabled']) && $v['enabled']) {
-                    $_options = null;
-                    if (isset($v['options'])) { 
-                        $_options = $v['options']; 
-                    }
-                    $routeCollector = new $decorator($routeCollector, $_options);
-                }
-            }
-        }
+        $routeCollector = $this->routeCollectorFactory->create();
 
         $routeDefinitionCallback = $this->routeDefinitionCallback;
         $routeDefinitionCallback($routeCollector);

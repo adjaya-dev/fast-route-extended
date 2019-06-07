@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adjaya\FastRoute\Handling;
 
 use ReflectionMethod;
+use Exception;
 
 class HandlingProvider implements HandlingProviderInterface
 {
@@ -39,14 +40,7 @@ class HandlingProvider implements HandlingProviderInterface
      * @var HandlingInterface current GroupHandling instance
      */
     protected $GroupHandling;
-
-    /**
-     * Array of Anonymous class that extends Handling.
-     *
-     * @var array
-     */
-    protected $_Handling;
-
+    
     /**
      * @var ReflectionMethod RouteHandling::setHandlers
      */
@@ -57,6 +51,8 @@ class HandlingProvider implements HandlingProviderInterface
      */
     protected $setGroupHandlers;
 
+    protected static $addonsScopes = ['global', 'route', 'group'];
+
     protected $RouteHandlingDecorator = [];
 
     protected $GroupHandlingDecorator = [];
@@ -64,19 +60,6 @@ class HandlingProvider implements HandlingProviderInterface
     public function __construct(?array $options = [])
     {
         $this->routesAddonsDataCurrentIndex = & $this->routesAddonsData;
-        
-        if (isset($options['handling'])) {
-            $Handling = $options['handling'];
-        } else {
-            $Handling = Handling::class;
-        }
-
-        class_alias($Handling , __NAMESPACE__ . '\_Handling');
-
-        $this->_Handling = [
-            'route' => new class() extends _Handling {},
-            'group' => new class() extends _Handling {},
-        ];
 
         $this->setOptions($options);
     }
@@ -109,10 +92,15 @@ class HandlingProvider implements HandlingProviderInterface
         }
     }
 
-    public function registerAddons(array $addons_stack): void 
+    protected function registerAddons(array $addons_stack): array 
     {
         foreach ($addons_stack as $scope => $addons) 
         {
+            if (!in_array($scope, self::$addonsScopes)) {
+                $mes = implode(' or ', self::$addonsScopes);
+                throw new Exception("Scope $scope not exists, must be $mes"); 
+            }
+
             $_addons = [];
 
             foreach ((array) $addons as $key => $value) 
@@ -136,6 +124,8 @@ class HandlingProvider implements HandlingProviderInterface
                     array_merge($this->registeredAddons['group'], $_addons);
             }
         }
+
+        return $_addons;
     }
 
     public function processAddons(array & $routesData): void
@@ -192,12 +182,12 @@ class HandlingProvider implements HandlingProviderInterface
         if (!$this->RouteHandling) 
         {
             $this->setRouteHandlers =
-                new ReflectionMethod($this->_Handling['route'], 'setHandlers');
+                new ReflectionMethod(RouteHandling::class, 'setHandlers');
 
             $this->setRouteHandlers->setAccessible(true);
 
             $this->RouteHandling = $O_RouteHandling =
-                new $this->_Handling['route']($this->registeredAddons['route']);
+                new RouteHandling($this->registeredAddons['route']);
 
             if (!empty($this->RouteHandlingDecorator))
             {
@@ -221,13 +211,13 @@ class HandlingProvider implements HandlingProviderInterface
         if (!$this->GroupHandling) 
         {
             $this->setGroupHandlers =
-                new ReflectionMethod($this->_Handling['group'], 'setHandlers');
+                new ReflectionMethod(GroupHandling::class, 'setHandlers');
 
             $this->setGroupHandlers->setAccessible(true);
         }
     
         $this->GroupHandling = $O_GroupHandling =
-        new $this->_Handling['group']($this->registeredAddons['group']);
+        new GroupHandling($this->registeredAddons['group']);
 
         if (!empty($this->GroupHandlingDecorator))
         {
