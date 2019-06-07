@@ -135,7 +135,7 @@ class HandlingProvider implements HandlingProviderInterface
         echo '<pre>';
         print_r($this->routesAddonsData);
         echo '</pre>';
-        */
+        //*/
         
         $this->_processAddons($this->routesAddonsData, $routesData);
     }
@@ -217,7 +217,7 @@ class HandlingProvider implements HandlingProviderInterface
         }
     
         $this->GroupHandling = $O_GroupHandling =
-        new GroupHandling($this->registeredAddons['group']);
+            new GroupHandling($this->registeredAddons['group']);
 
         if (!empty($this->GroupHandlingDecorator))
         {
@@ -260,7 +260,7 @@ class HandlingProvider implements HandlingProviderInterface
             $O_RouteHandling,
             [
                 & $this->routesAddonsDataCurrentIndex[$route_id],
-                $route_id
+                & $route_id
             ]
         );
        
@@ -272,6 +272,7 @@ class HandlingProvider implements HandlingProviderInterface
      */
     public function beforeAddGroup(): HandlingInterface
     {
+        $groupId = null;
         $previousIdx = & $this->routesAddonsDataCurrentIndex;
 
         $this->routesAddonsDataCurrentIndex =
@@ -289,7 +290,8 @@ class HandlingProvider implements HandlingProviderInterface
         $this->setGroupHandlers->invokeArgs(
             $O_GroupHandling,
             [
-                & $this->routesAddonsDataCurrentIndex['*addons*']
+                & $this->routesAddonsDataCurrentIndex['*addons*'],
+                'group_'.spl_object_id($O_GroupHandling)
             ]
         );
 

@@ -32,10 +32,12 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
      */
     protected function setOptions(array $options): void
     {
+        //*
         echo '<pre>';
-        var_dump('$options');
+        var_dump('********* $options *************');
         print_r($options);
         echo '</pre>';
+        //*/
 
         if (isset($options['handlingProvider'])) {
             $handlingProvider = $options['handlingProvider'];

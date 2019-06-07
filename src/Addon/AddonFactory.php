@@ -20,7 +20,7 @@ class AddonFactory
      *      'global' => [],
      *      'route'  => [],
      *      'group'  => [],
-     *    ]
+     *  ]
      *
      * @var array
      */
@@ -31,14 +31,14 @@ class AddonFactory
         $this->addons = $addons;
     }
 
-    public function setHandlingProvider($handlingProviderClass) 
+    public function setHandlingProvider($handlingProviderClass): AddonFactory  
     {
         $this->handlingProviderClass = $handlingProviderClass;
 
         return $this;
     }
 
-    public function setHandlingProviderDecorators($decorators) 
+    public function setHandlingProviderDecorators(array $decorators): AddonFactory
     {
         foreach ($decorators as $decorator) {
             $class = key($decorator);
@@ -50,7 +50,7 @@ class AddonFactory
         return $this;
     }
 
-    public function create() 
+    public function create(): array
     {
         $options['addons'] = $this->addons;
 

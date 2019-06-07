@@ -13,7 +13,7 @@ class MacroableFactory
      *      'global' => [],
      *      'route'  => [],
      *      'group'  => [],
-     *    ]
+     *  ]
      *
      * @var array
      */
@@ -24,7 +24,7 @@ class MacroableFactory
         $this->macros = $macros;
     }
 
-    public function create() 
+    public function create(): array 
     {
         return [$this->macroableClass => $this->macros];
     }

@@ -40,8 +40,8 @@ class Router
      */
     public function __construct(
         callable $routeDefinitionCallback,
-        $routeCollectorFactory,
-        $options = []
+        RouteCollectorFactory $routeCollectorFactory,
+        array $options = []
     )
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;

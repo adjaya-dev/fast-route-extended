@@ -23,7 +23,7 @@ class RouteCollectorFactory
         }
     }
 
-    public function setDecorators(array $decorators) 
+    public function setDecorators(array $decorators): RouteCollectorFactory
     {
         foreach ($decorators as $decorator) {
             $class = key($decorator);
@@ -35,21 +35,35 @@ class RouteCollectorFactory
         return $this;
     }
 
-    public function create() 
+    public function create(): Object 
     {
-        $RouteCollector = 
-            new $this->options['routeCollector']($this->getRouteParser(), $this->getDataGenerator());
+        $RouteCollector = $this->getRouteCollector(); 
 
         if (isset($this->routeCollectorDecorators)) {
-            foreach ($this->routeCollectorDecorators as $class => $options) {
-                $RouteCollector = new $class($RouteCollector, $options);
-            }
+            $RouteCollector = $this->decorate($RouteCollector);
         }
 
         return $RouteCollector;
-    } 
+    }
 
-    protected function getDataGenerator() 
+    protected function getRouteCollector(): RouteCollectorInterface 
+    {
+        return new $this->options['routeCollector'](
+                $this->getRouteParser(),
+                $this->getDataGenerator()
+            );
+    }
+
+    protected function Decorate($RouteCollector): RouteCollectorDecoratorInterface
+    {
+        foreach ($this->routeCollectorDecorators as $class => $options) {
+            $RouteCollector = new $class($RouteCollector, $options);
+        }
+
+        return $RouteCollector;
+    }
+
+    protected function getDataGenerator(): DataGenerator\DataGeneratorInterface
     {
         $DataGenerator = new $this->options['dataGenerator']();
 
@@ -61,7 +75,7 @@ class RouteCollectorFactory
         return $DataGenerator;
     }
 
-    protected function getRouteParser() 
+    protected function getRouteParser(): RouteParser\RouteParserInterface  
     {
         return new $this->options['routeParser']();
     }

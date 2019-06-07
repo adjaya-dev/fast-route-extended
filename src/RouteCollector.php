@@ -161,7 +161,7 @@ class RouteCollector implements RouteCollectorInterface
         return $this->currentRouteId;
     }
 
-    public function getCurrentGroupId(): string 
+    public function getCurrentGroupId(): ?string 
     {
         return $this->currentGroupId;
     }
