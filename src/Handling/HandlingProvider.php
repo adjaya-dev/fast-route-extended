@@ -260,7 +260,7 @@ class HandlingProvider implements HandlingProviderInterface
             $O_RouteHandling,
             [
                 & $this->routesAddonsDataCurrentIndex[$route_id],
-                & $route_id
+                $route_id
             ]
         );
        
@@ -272,7 +272,6 @@ class HandlingProvider implements HandlingProviderInterface
      */
     public function beforeAddGroup(): HandlingInterface
     {
-        $groupId = null;
         $previousIdx = & $this->routesAddonsDataCurrentIndex;
 
         $this->routesAddonsDataCurrentIndex =
@@ -291,7 +290,7 @@ class HandlingProvider implements HandlingProviderInterface
             $O_GroupHandling,
             [
                 & $this->routesAddonsDataCurrentIndex['*addons*'],
-                'group_'.spl_object_id($O_GroupHandling)
+                'group_'.spl_object_id($GroupHandling)
             ]
         );
 
