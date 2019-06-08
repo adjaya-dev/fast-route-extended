@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
-class RouteCollectorFactory
+class RouteCollectorFactory implements RouteCollectorFactoryInterface
 {
     protected $options = [
         'routeCollector'   => RouteCollector::class,
@@ -23,7 +23,7 @@ class RouteCollectorFactory
         }
     }
 
-    public function setDecorators(array $decorators): RouteCollectorFactory
+    public function setDecorators(array $decorators): RouteCollectorFactoryInterface
     {
         foreach ($decorators as $decorator) {
             $class = key($decorator);
@@ -54,7 +54,7 @@ class RouteCollectorFactory
             );
     }
 
-    protected function Decorate($RouteCollector): RouteCollectorDecoratorInterface
+    protected function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface
     {
         foreach ($this->routeCollectorDecorators as $class => $options) {
             $RouteCollector = new $class($RouteCollector, $options);

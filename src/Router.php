@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
+use Closure;
 use Exception;
 use LogicException;
 use RuntimeException;
@@ -18,7 +19,7 @@ class Router
     //protected $RouterDispatcher;
 
     /**
-     * @var object
+     * @var DispatcherInterface
      */
     protected $dispatcher;
 
@@ -27,8 +28,16 @@ class Router
      */
     protected $routeDefinitionCallback;
 
+    /**
+     * @var callable
+     */
     protected $routeCollectorFactory;
 
+    /**
+     * Router options
+     *
+     * @var array
+     */
     protected $options = [
         'dispatcher'       => Dispatcher\MarkBased::class,
         'cacheDisabled'    => false,
@@ -36,11 +45,12 @@ class Router
 
     /**
      * @param callable $routeDefinitionCallback
+     * @param callable $routeCollectorFactory
      * @param array    $options
      */
     public function __construct(
         callable $routeDefinitionCallback,
-        RouteCollectorFactory $routeCollectorFactory,
+        callable $routeCollectorFactory,
         array $options = []
     )
     {
@@ -51,21 +61,43 @@ class Router
         $this->options = $options + $this->options;
     }
 
-    public function getCachedRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
+    /**
+     * Return instance of RouteCollectorInterface
+     * or RouteCollectorDecoratorInterface
+     *
+     * @param   callable  $routeCollectorFactory
+     *
+     * @return  object
+     */
+    protected function getRouteCollector(callable $routeCollectorFactory): object 
     {
-        $this->setCachedDispatcher();
-        return $this->getRouterDispatcher($Request);
-    }
+        if ($routeCollectorFactory instanceof Closure) 
+        {
+            $routeCollector = $routeCollectorFactory();
+        } 
+        elseif (is_array($routeCollectorFactory) )
+        {
+            $routeCollector = call_user_func($routeCollectorFactory);
+        }
 
-    public function getSimpleRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
-    {
-        $this->setSimpleDispatcher();
-        return $this->getRouterDispatcher($Request);
-    }
+        if ($routeCollector instanceof RouteCollectorFactoryInterface) {
+            $routeCollector = $routeCollector->create();
+        }
 
-    Protected function getRouterDispatcher(Psr\Http\Message\RequestInterface $Request) 
-    {
-        return new RouterDispatcher($this->Dispatcher, $Request);
+        if (
+            $routeCollector instanceof RouteCollectorInterface || 
+            $routeCollector instanceof RouteCollectorDecoratorInterface
+        ) {
+            return $routeCollector;
+        } else {
+            $class = get_class($routeCollector);
+            throw new Exception(
+                "Return value of Adjaya\FastRoute\Router::getRouteCollector() 
+                must be an instance of Adjaya\FastRoute\RouteCollectorInterface 
+                or Adjaya\FastRoute\RouteCollectorDecoratorInterface, 
+                instance of $class returned"
+            );
+        }
     }
 
     /**
@@ -132,9 +164,9 @@ class Router
     }
 
     /**
-     * @return object [return description]
+     * @return ReverseRouter
      */
-    public function getReverseRouter(): object
+    public function getReverseRouter(): ReverseRouter
     {
         if (method_exists($this->options['routeParser'], 'getReverseRouter')) 
         {
@@ -152,7 +184,7 @@ class Router
     {
         $dispatchData = $this->simpleRoutes();
 
-        $this->setDispatcher($dispatchData);
+        $this->dispatcher = $this->getDispatcher($dispatchData);
     }
 
     /**
@@ -162,19 +194,19 @@ class Router
     {
         $dispatchData = $this->cachedRoutes();
 
-        $this->setDispatcher($dispatchData);
+        $this->dispatcher = $this->getDispatcher($dispatchData);
     }
 
-    protected function setDispatcher(array $dispatchData): void
+    protected function getDispatcher(array $dispatchData): Dispatcher\DispatcherInterface
     {
         $this->setRoutesData($dispatchData);
 
-        $this->dispatcher = new $this->options['dispatcher']($dispatchData, $this->routesData);
+        return new $this->options['dispatcher']($dispatchData, $this->routesData);
     }
 
     public function simpleRoutes(): array
     {
-        $routeCollector = $this->routeCollectorFactory->create();
+        $routeCollector = $this->getRouteCollector($this->routeCollectorFactory);
 
         $routeDefinitionCallback = $this->routeDefinitionCallback;
         $routeDefinitionCallback($routeCollector);
