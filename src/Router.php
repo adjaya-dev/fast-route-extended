@@ -28,10 +28,12 @@ class Router
      */
     protected $routeDefinitionCallback;
 
+    protected $routeCollectorDecoratorsStack;
+
     /**
      * @var callable
      */
-    protected $routeCollectorFactory;
+    protected $routeCollectorDecoratorsFactory;
 
     /**
      * Router options
@@ -39,26 +41,42 @@ class Router
      * @var array
      */
     protected $options = [
+        'routeCollector'   => RouteCollector::class,
+        'routeParser'      => RouteParser\Std::class,
+        'dataGenerator'    => DataGenerator\MarkBased::class,
         'dispatcher'       => Dispatcher\MarkBased::class,
         'cacheDisabled'    => false,
+        'routeCollectorDecoratorsFactory' => RouteCollectorDecoratorsFactory::class,
     ];
 
     /**
      * @param callable $routeDefinitionCallback
-     * @param callable $routeCollectorFactory
-     * @param array    $options
+     * @param null|array    $options
      */
-    public function __construct(
-        callable $routeDefinitionCallback,
-        callable $routeCollectorFactory,
-        array $options = []
-    )
+    public function __construct(callable $routeDefinitionCallback, ?array $options = [])
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;
 
-        $this->routeCollectorFactory = $routeCollectorFactory;
-
         $this->options = $options + $this->options;
+    }
+
+    public function setRouteCollectorDecorators($decorators) 
+    {
+        $this->getRouteCollectorDecoratorsFactory()->setDecorators($decorators);
+    }
+
+    protected function getRouteCollectorDecoratorsFactory() 
+    {
+        if (!$this->routeCollectorDecoratorsFactory) {
+            $this->routeCollectorDecoratorsFactory = new $this->options['routeCollectorDecoratorsFactory']() ;
+        }
+
+        return $this->routeCollectorDecoratorsFactory;
+    }
+
+    protected function getdecoratedRouteCollector(RouteCollectorInterface $routeCollector) 
+    {
+        return $this->getRouteCollectorDecoratorsFactory()->create($routeCollector);
     }
 
     /**
@@ -69,20 +87,30 @@ class Router
      *
      * @return  object
      */
-    protected function getRouteCollector(callable $routeCollectorFactory): object 
+    protected function _getDecoratedRouteCollector(
+        $routeCollector,
+        callable $routeCollectorDecoratorsFactory): object 
     {
-        if ($routeCollectorFactory instanceof Closure) 
+        if ($routeCollectorDecoratorsFactory instanceof Closure) 
         {
-            $routeCollector = $routeCollectorFactory();
+            $routeCollectorDecoratorsFactory = $routeCollectorDecoratorsFactory();
         } 
-        elseif (is_array($routeCollectorFactory) )
+        elseif (is_array($routeCollectorDecoratorsFactory) )
         {
-            $routeCollector = call_user_func($routeCollectorFactory);
+            $routeCollectorDecoratorsFactory = call_user_func($routeCollectorDecoratorsFactory);
         }
 
-        if ($routeCollector instanceof RouteCollectorFactoryInterface) {
-            $routeCollector = $routeCollector->create();
+        if (!($routeCollectorDecoratorsFactory instanceof RouteCollectorDecoratorsFactoryInterface)) {
+            $class = get_class($routeCollectorDecoratorsFactory);
+            throw new Exception(
+                "value of Adjaya\FastRoute\Router::getRouteCollector() 
+                must be an instance of Adjaya\FastRoute\RouteCollectorDecoratorsFactoryInterface,
+                instance of $class given"
+            );
         }
+
+        $routeCollector = 
+            $routeCollectorDecoratorsFactory->create($routeCollector);
 
         if (
             $routeCollector instanceof RouteCollectorInterface || 
@@ -98,6 +126,31 @@ class Router
                 instance of $class returned"
             );
         }
+    }
+
+    protected function getRouteCollector(): RouteCollectorInterface 
+    {
+        return new $this->options['routeCollector'](
+                $this->getRouteParser(),
+                $this->getDataGenerator()
+            );
+    }
+
+    protected function getRouteParser(): RouteParser\RouteParserInterface  
+    {
+        return new $this->options['routeParser']();
+    }
+
+    protected function getDataGenerator(): DataGenerator\DataGeneratorInterface
+    {
+        $DataGenerator = new $this->options['dataGenerator']();
+
+        if (isset($options['allowIdenticalRegexRoutes']) && !$options['allowIdenticalRegexRoutes']) 
+        { // Default true
+            $DataGenerator->allowIdenticalsRegexRoutes(false);
+        }
+
+        return $DataGenerator;
     }
 
     /**
@@ -206,8 +259,16 @@ class Router
 
     public function simpleRoutes(): array
     {
-        $routeCollector = $this->getRouteCollector($this->routeCollectorFactory);
+        $routeCollector = $this->getRouteCollector();
 
+        if ($this->routeCollectorDecoratorsFactory) {
+            $routeCollector = 
+                $this->getDecoratedRouteCollector(
+                    $routeCollector,
+                    $this->routeCollectorDecoratorsFactory
+                );
+        }
+ 
         $routeDefinitionCallback = $this->routeDefinitionCallback;
         $routeDefinitionCallback($routeCollector);
 

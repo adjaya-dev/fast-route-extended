@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-class MacroableFactory 
+use Adjaya\FastRoute\DecoratorDefinitionFactoryInterface;
+
+class MacroableFactory implements DecoratorDefinitionFactoryInterface
 {
     protected $macroableClass = HandlingProviderDecoratorMacroable::class;
 

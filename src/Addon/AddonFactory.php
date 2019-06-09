@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Addon;
 
-class AddonFactory
+use Adjaya\FastRoute\DecoratorDefinitionFactoryInterface;
+
+class AddonFactory implements DecoratorDefinitionFactoryInterface
 {
     protected $addonClass = RouteCollectorDecoratorAddon::class;
 
