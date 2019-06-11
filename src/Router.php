@@ -60,15 +60,20 @@ class Router
         $this->options = $options + $this->options;
     }
 
-    public function setRouteCollectorDecorators($decorators) 
+    public function setRouteCollectorDecorators(array $decorators) 
     {
         $this->getRouteCollectorDecoratorsFactory()->setDecorators($decorators);
+    }
+
+    public function setRouteCollectorDecorator(ConfigurationInterface $decorator) 
+    {
+        $this->getRouteCollectorDecoratorsFactory()->setDecorator($decorator);
     }
 
     protected function getRouteCollectorDecoratorsFactory() 
     {
         if (!$this->routeCollectorDecoratorsFactory) {
-            $this->routeCollectorDecoratorsFactory = new $this->options['routeCollectorDecoratorsFactory']() ;
+            $this->routeCollectorDecoratorsFactory = new $this->options['routeCollectorDecoratorsFactory']();
         }
 
         return $this->routeCollectorDecoratorsFactory;

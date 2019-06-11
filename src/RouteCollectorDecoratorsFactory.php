@@ -20,12 +20,22 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
     public function setDecorators(array $decorators): RouteCollectorDecoratorsFactoryInterface
     {
         foreach ($decorators as $decorator) {
-            $class = key($decorator);
-            $options = (array) current($decorator);
 
-            $this->routeCollectorDecorators[$class] = $options;
+            $this->setDecorator($decorator);
         }
         
+        return $this;
+    }
+
+    public function setDecorator(ConfigurationInterface $decorator):  RouteCollectorDecoratorsFactoryInterface
+    {
+        $decorator = $decorator->provide();
+
+        $class = key($decorator);
+        $options = (array) current($decorator);
+
+        $this->routeCollectorDecorators[$class] = $options;
+
         return $this;
     }
 
