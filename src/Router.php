@@ -25,9 +25,7 @@ class Router
      * @var callable
      */
     protected $routeDefinitionCallback;
-
-    protected $routeCollectorDecoratorConfigurators = [];
-    
+        
     /**
      * Router options
      *
@@ -184,7 +182,7 @@ class Router
         RouteCollectorInterface $routeCollector
     ): RouteCollectorDecoratorInterface 
     {
-        return $this->getRouteCollectorDecoratorsFactory()->create($routeCollector);
+        return $this->getRouteCollectorDecoratorsFactory()->decorate($routeCollector);
     }
 
     protected function getRouteCollectorDecoratorsFactory(): RouteCollectorDecoratorsFactoryInterface
@@ -220,7 +218,7 @@ class Router
         return $this->routesData;
     }
 
-    public function getRoutesInfo() {
+    public function getRoutesInfo(): array {
         return $this->routesData['info'];
     }
 

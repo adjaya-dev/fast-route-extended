@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Addon;
 
-use Adjaya\FastRoute\ConfiguratorInterface;
+use Adjaya\FastRoute\RouteCollectorDecoratorConfiguratorInterface;
 use Adjaya\FastRoute\Handling\HandlingProviderDecoratorConfiguratorInterface;
 
-interface AddonConfiguratorInterface extends ConfiguratorInterface
+interface AddonConfiguratorInterface extends RouteCollectorDecoratorConfiguratorInterface
 {
     public function setHandlingProvider(string $handlingProviderClass): AddonConfiguratorInterface;
     

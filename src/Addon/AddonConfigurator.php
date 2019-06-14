@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Addon;
 
+use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 use Adjaya\FastRoute\Handling\HandlingProviderDecoratorConfiguratorInterface;
 use Exception;
 
@@ -56,10 +57,10 @@ class AddonConfigurator implements AddonConfiguratorInterface
         return $this;
     }
 
-    public function addAddons($scope, $addons): AddonConfiguratorInterface
+    public function addAddons(string $scope, array $addons): AddonConfiguratorInterface
     {
         if (in_array($scope, $this->scopes)) {
-            $this->addons[$scope] = (array) $addons;
+            $this->addons[$scope] = $addons;
         }
 
         return $this;
@@ -68,7 +69,6 @@ class AddonConfigurator implements AddonConfiguratorInterface
     public function addHandlingProviderDecorator(
         HandlingProviderDecoratorConfiguratorInterface $decorator): AddonConfiguratorInterface
     {
-        
         $decorator = $decorator->provide();
 
         $class = key($decorator);
@@ -83,7 +83,19 @@ class AddonConfigurator implements AddonConfiguratorInterface
         return $this;
     }
 
+    public function decorate(object $routeCollector): RouteCollectorDecoratorInterface
+    {
+        return new $this->addonClass($routeCollector, $this->getOptions());
+    }
+
     public function provide(): array
+    {
+        $options = $this->getOptions();
+
+        return [$this->addonClass => $options];
+    }
+
+    protected function getOptions()
     {
         $options['addons'] = $this->addons;
 
@@ -96,6 +108,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
             $options['handlingProviderDecorators'] = $this->handlingProviderDecorators;
         }
 
-        return [$this->addonClass => $options];
+        return $options;
+
     }
 }

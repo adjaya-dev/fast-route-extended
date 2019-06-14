@@ -31,7 +31,7 @@ class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInte
         }
     }
 
-    public function addMacros($scope, $macros): HandlingProviderDecoratorConfiguratorInterface
+    public function addMacros(string $scope, $macros): HandlingProviderDecoratorConfiguratorInterface
     {
         if (in_array($scope, $this->scopes)) 
         {

@@ -8,7 +8,7 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
 {
     protected $options = [];
 
-    protected $routeCollectorDecorators;
+    protected $routeCollectorDecoratorConfigurators;
 
     protected $routeCollector;
 
@@ -19,39 +19,26 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
 
     public function setDecoratorConfigurators(array $decorators): RouteCollectorDecoratorsFactoryInterface
     {
-        foreach ($decorators as $decorator) {
-
+        foreach ($decorators as $decorator) 
+        {
             $this->setDecoratorConfigurator($decorator);
         }
         
         return $this;
     }
 
-    public function setDecoratorConfigurator(ConfiguratorInterface $decorator):  RouteCollectorDecoratorsFactoryInterface
+    public function setDecoratorConfigurator(RouteCollectorDecoratorConfiguratorInterface $decorator):  RouteCollectorDecoratorsFactoryInterface
     {
-        $decorator = $decorator->provide();
-
-        $class = key($decorator);
-        $options = (array) current($decorator);
-
-        $this->routeCollectorDecorators[$class] = $options;
+        $this->routeCollectorDecoratorConfigurators[] = $decorator;
 
         return $this;
     }
 
-    public function create(RouteCollectorInterface $RouteCollector): Object 
+    public function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface
     {
-        if (isset($this->routeCollectorDecorators)) {
-            $RouteCollector = $this->decorate($RouteCollector);
-        }
-
-        return $RouteCollector;
-    }
-
-    protected function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface
-    {
-        foreach ($this->routeCollectorDecorators as $class => $options) {
-            $RouteCollector = new $class($RouteCollector, $options);
+        foreach ($this->routeCollectorDecoratorConfigurators as $configurator) 
+        {
+            $RouteCollector = $configurator->decorate($RouteCollector);
         }
 
         return $RouteCollector;
