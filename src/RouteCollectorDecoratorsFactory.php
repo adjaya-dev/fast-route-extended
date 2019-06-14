@@ -10,24 +10,24 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
 
     protected $routeCollectorDecorators;
 
-    public function __construct(?array $options = null) 
+    protected $routeCollector;
+
+    public function __construct(array $routeCollectorDecoratorConfigurators = []) 
     {
-        if ($options) {
-            $this->options = $options + $this->options;
-        }
+        $this->setDecoratorConfigurators($routeCollectorDecoratorConfigurators);
     }
 
-    public function setDecorators(array $decorators): RouteCollectorDecoratorsFactoryInterface
+    public function setDecoratorConfigurators(array $decorators): RouteCollectorDecoratorsFactoryInterface
     {
         foreach ($decorators as $decorator) {
 
-            $this->setDecorator($decorator);
+            $this->setDecoratorConfigurator($decorator);
         }
         
         return $this;
     }
 
-    public function setDecorator(ConfigurationInterface $decorator):  RouteCollectorDecoratorsFactoryInterface
+    public function setDecoratorConfigurator(ConfiguratorInterface $decorator):  RouteCollectorDecoratorsFactoryInterface
     {
         $decorator = $decorator->provide();
 

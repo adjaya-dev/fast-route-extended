@@ -16,8 +16,6 @@ class Router
      */
     protected $routesData;
 
-    //protected $RouterDispatcher;
-
     /**
      * @var DispatcherInterface
      */
@@ -28,13 +26,8 @@ class Router
      */
     protected $routeDefinitionCallback;
 
-    protected $routeCollectorDecoratorsStack;
-
-    /**
-     * @var callable
-     */
-    protected $routeCollectorDecoratorsFactory;
-
+    protected $routeCollectorDecoratorConfigurators = [];
+    
     /**
      * Router options
      *
@@ -57,182 +50,13 @@ class Router
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;
 
-        $this->options = $options + $this->options;
-    }
-
-    public function setRouteCollectorDecorators(array $decorators) 
-    {
-        $this->getRouteCollectorDecoratorsFactory()->setDecorators($decorators);
-    }
-
-    public function setRouteCollectorDecorator(ConfigurationInterface $decorator) 
-    {
-        $this->getRouteCollectorDecoratorsFactory()->setDecorator($decorator);
-    }
-
-    protected function getRouteCollectorDecoratorsFactory() 
-    {
-        if (!$this->routeCollectorDecoratorsFactory) {
-            $this->routeCollectorDecoratorsFactory = new $this->options['routeCollectorDecoratorsFactory']();
-        }
-
-        return $this->routeCollectorDecoratorsFactory;
-    }
-
-    protected function getdecoratedRouteCollector(RouteCollectorInterface $routeCollector) 
-    {
-        return $this->getRouteCollectorDecoratorsFactory()->create($routeCollector);
-    }
-
-    /**
-     * Return instance of RouteCollectorInterface
-     * or RouteCollectorDecoratorInterface
-     *
-     * @param   callable  $routeCollectorFactory
-     *
-     * @return  object
-     */
-    protected function _getDecoratedRouteCollector(
-        $routeCollector,
-        callable $routeCollectorDecoratorsFactory): object 
-    {
-        if ($routeCollectorDecoratorsFactory instanceof Closure) 
-        {
-            $routeCollectorDecoratorsFactory = $routeCollectorDecoratorsFactory();
-        } 
-        elseif (is_array($routeCollectorDecoratorsFactory) )
-        {
-            $routeCollectorDecoratorsFactory = call_user_func($routeCollectorDecoratorsFactory);
-        }
-
-        if (!($routeCollectorDecoratorsFactory instanceof RouteCollectorDecoratorsFactoryInterface)) {
-            $class = get_class($routeCollectorDecoratorsFactory);
-            throw new Exception(
-                "value of Adjaya\FastRoute\Router::getRouteCollector() 
-                must be an instance of Adjaya\FastRoute\RouteCollectorDecoratorsFactoryInterface,
-                instance of $class given"
-            );
-        }
-
-        $routeCollector = 
-            $routeCollectorDecoratorsFactory->create($routeCollector);
-
-        if (
-            $routeCollector instanceof RouteCollectorInterface || 
-            $routeCollector instanceof RouteCollectorDecoratorInterface
-        ) {
-            return $routeCollector;
-        } else {
-            $class = get_class($routeCollector);
-            throw new Exception(
-                "Return value of Adjaya\FastRoute\Router::getRouteCollector() 
-                must be an instance of Adjaya\FastRoute\RouteCollectorInterface 
-                or Adjaya\FastRoute\RouteCollectorDecoratorInterface, 
-                instance of $class returned"
-            );
-        }
-    }
-
-    protected function getRouteCollector(): RouteCollectorInterface 
-    {
-        return new $this->options['routeCollector'](
-                $this->getRouteParser(),
-                $this->getDataGenerator()
-            );
-    }
-
-    protected function getRouteParser(): RouteParser\RouteParserInterface  
-    {
-        return new $this->options['routeParser']();
-    }
-
-    protected function getDataGenerator(): DataGenerator\DataGeneratorInterface
-    {
-        $DataGenerator = new $this->options['dataGenerator']();
-
-        if (isset($options['allowIdenticalRegexRoutes']) && !$options['allowIdenticalRegexRoutes']) 
-        { // Default true
-            $DataGenerator->allowIdenticalsRegexRoutes(false);
-        }
-
-        return $DataGenerator;
-    }
-
-    /**
-     * @param string $method
-     * @param string $path
-     *
-     * @return array $routeInfo
-     */
-    public function dispatch(string $method, string $path): array
-    {
-        if ($this->dispatcher) {
-            $routeInfo = $this->dispatcher->dispatch($method, $path);
-
-            return $routeInfo;
-        }
-        throw new LogicException('Dispatcher must be set first');
-    }
-
-    /**
-     * @param array &$dispatchData
-     */
-    protected function setRoutesData(array &$dispatchData): void
-    {
-        if (isset($dispatchData['routes_data'])) {
-            $this->routesData = $dispatchData['routes_data'];
-            unset($dispatchData['routes_data']);
-        }
-    }
-
-    /**
-     * Get routes Data.
-     *
-     * @return array
-     */
-    public function getRoutesData(): array
-    {
-        return $this->routesData;
-    }
-
-    /**
-     * @param string $id Route id
-     *
-     * @return array|null
-     */
-    public function getRouteInfo(string $id): ?array
-    {
-        if ($routes_info = !isset($this->routesData['info'][$id]) ?
-            null : $this->routesData['info'][$id]
-        ) {
-            return $routes_info;
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getReverseRoutesData(): array
-    {
-        if (isset($this->routesData['reverse'])) {
-            return $this->routesData['reverse'];
-        }
-
-        throw new Exception('Not reverse data found!');
-    }
-
-    /**
-     * @return ReverseRouter
-     */
-    public function getReverseRouter(): ReverseRouter
-    {
-        if (method_exists($this->options['routeParser'], 'getReverseRouter')) 
-        {
-            return 
-            ($this->options['routeParser'])::getReverseRouter($this->getReverseRoutesData());
-        }
-
-        throw new RuntimeException($this->options['routeParser'].'::getReverseRouter does not exist');
+        $this->options =  $options + $this->options;
+        /*/
+        var_dump('************Router Options');
+        echo '<pre>';
+        print_r($this->options);
+        echo '</pre>';
+        //*/
     }
 
     /**
@@ -255,25 +79,15 @@ class Router
         $this->dispatcher = $this->getDispatcher($dispatchData);
     }
 
-    protected function getDispatcher(array $dispatchData): Dispatcher\DispatcherInterface
-    {
-        $this->setRoutesData($dispatchData);
-
-        return new $this->options['dispatcher']($dispatchData, $this->routesData);
-    }
-
     public function simpleRoutes(): array
     {
         $routeCollector = $this->getRouteCollector();
 
-        if ($this->routeCollectorDecoratorsFactory) {
-            $routeCollector = 
-                $this->getDecoratedRouteCollector(
-                    $routeCollector,
-                    $this->routeCollectorDecoratorsFactory
-                );
+        if (isset($this->options['routeCollectorDecorators']) && $this->options['routeCollectorDecorators'])
+        {
+            $routeCollector = $this->getDecoratedRouteCollector($routeCollector);
         }
- 
+
         $routeDefinitionCallback = $this->routeDefinitionCallback;
         $routeDefinitionCallback($routeCollector);
 
@@ -305,5 +119,144 @@ class Router
         );
 
         return $dispatchData;
+    }
+   
+    /**
+     * @param array &$dispatchData
+     */
+    protected function setRoutesData(array &$dispatchData): void
+    {
+        if (isset($dispatchData['routes_data'])) {
+            $this->routesData = $dispatchData['routes_data'];
+            unset($dispatchData['routes_data']);
+        }
+    }
+
+    /**
+     * @param string $method
+     * @param string $path
+     *
+     * @return array $routeInfo
+     */
+    public function dispatch(string $method, string $path): array
+    {
+        if ($this->dispatcher) {
+            $routeInfo = $this->dispatcher->dispatch($method, $path);
+
+            return $routeInfo;
+        }
+        throw new LogicException('Dispatcher must be set first');
+    }
+        
+    protected function getDispatcher(array $dispatchData): Dispatcher\DispatcherInterface
+    {
+        $this->setRoutesData($dispatchData);
+
+        return new $this->options['dispatcher']($dispatchData, $this->routesData);
+    }
+
+    protected function getRouteCollector(): RouteCollectorInterface 
+    {
+        return new $this->options['routeCollector'](
+                $this->getRouteParser(),
+                $this->getDataGenerator()
+            );
+    }
+
+    protected function getRouteParser(): RouteParser\RouteParserInterface  
+    {
+        return new $this->options['routeParser']();
+    }
+
+    protected function getDataGenerator(): DataGenerator\DataGeneratorInterface
+    {
+        $DataGenerator = new $this->options['dataGenerator']();
+
+        if (isset($options['allowIdenticalRegexRoutes']) && !$options['allowIdenticalRegexRoutes']) 
+        { // Default true
+            $DataGenerator->allowIdenticalsRegexRoutes(false);
+        }
+
+        return $DataGenerator;
+    }
+
+    protected function getDecoratedRouteCollector(
+        RouteCollectorInterface $routeCollector
+    ): RouteCollectorDecoratorInterface 
+    {
+        return $this->getRouteCollectorDecoratorsFactory()->create($routeCollector);
+    }
+
+    protected function getRouteCollectorDecoratorsFactory(): RouteCollectorDecoratorsFactoryInterface
+    {
+        return 
+            new $this->options['routeCollectorDecoratorsFactory'](
+                $this->getRouteCollectorDecoratorConfigurators()
+            );
+    }
+
+    protected function getRouteCollectorDecoratorConfigurators(): array
+    {
+        $configurators = [];
+        foreach ($this->options['routeCollectorDecorators'] as $configuratorClass => $options) {
+            $configurators[] = $this->getConfigurator($configuratorClass, $options);
+        }
+
+        return $configurators;
+    }
+
+    protected function getConfigurator(string $configuratorClass, array $options): ConfiguratorInterface
+    {
+        return new $configuratorClass($options);
+    }
+
+    /**
+     * Get routes Data.
+     *
+     * @return array
+     */
+    public function getRoutesData(): array
+    {
+        return $this->routesData;
+    }
+
+    public function getRoutesInfo() {
+        return $this->routesData['info'];
+    }
+
+    /**
+     * @param string $id Route id
+     *
+     * @return array|null
+     */
+    public function getRouteInfo(string $id): ?array
+    {
+        return !isset($this->routesData['info'][$id]) ? null : $this->routesData['info'][$id];
+    }
+
+    /**
+     * @return array
+     */
+    public function getReverseRoutesData(): array
+    {
+        if (isset($this->routesData['reverse'])) {
+            return $this->routesData['reverse'];
+        }
+
+        throw new Exception('Not reverse data found!');
+    }
+
+    /**
+     * @return ReverseRouter
+     */
+    public function getReverseRouter(): ReverseRouter
+    {
+        if (method_exists($this->options['routeParser'], 'getReverseRouter')) 
+        {
+            return 
+            ($this->options['routeParser'])::getReverseRouter($this->getReverseRoutesData());
+        }
+
+        throw new RuntimeException($this->options['routeParser'].'::getReverseRouter does not exist');
     }
 }

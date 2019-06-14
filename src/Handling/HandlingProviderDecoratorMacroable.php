@@ -16,7 +16,18 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 
         $this->HandlingProvider->setGroupHandlingDecorator(GroupHandlingDecoratorMacro::class);
 
-        $this->builtAddonsMacros($this->getRegisteredAddons());
+        $auto = true; // Default
+        if (isset($options['auto'])) {
+            if (!$options['auto']) {
+                $auto = false;
+            }
+
+            unset($options['auto']);
+        }
+
+        if ($auto) {
+            $this->builtAddonsMacros($this->getRegisteredAddons());
+        }
 
         $this->setOptions($options);
     }
