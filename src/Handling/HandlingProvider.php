@@ -195,9 +195,9 @@ class HandlingProvider implements HandlingProviderInterface
                 {
                     $this->RouteHandling = new $decorator($this->RouteHandling);
                 }
+
+                $O_RouteHandling->setChild($this->RouteHandling);
             }
-            
-            $O_RouteHandling->setChild($this->RouteHandling);
         }
 
         return $this->RouteHandling;
@@ -225,9 +225,9 @@ class HandlingProvider implements HandlingProviderInterface
             {
                 $this->GroupHandling = new $decorator($this->GroupHandling);
             }
-        }
 
-        $O_GroupHandling->setChild($this->GroupHandling);
+            $O_GroupHandling->setChild($this->GroupHandling);
+        }
 
         return $this->GroupHandling;
     }

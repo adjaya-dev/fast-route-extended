@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adjaya\FastRoute\Addon;
 
 use Adjaya\FastRoute\Handling\HandlingInterface;
+use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 
 class RouteCollectorDecoratorAddonBase implements RouteCollectorDecoratorAddonInterface
 {
@@ -15,7 +16,7 @@ class RouteCollectorDecoratorAddonBase implements RouteCollectorDecoratorAddonIn
 
     protected $options;
 
-    public function __construct(RouteCollectorDecoratorAddonInterface $RouteCollector,
+    public function __construct(RouteCollectorDecoratorInterface $RouteCollector,
         ?array $options = null)
     {
         $this->RouteCollector = $RouteCollector;
@@ -39,13 +40,13 @@ class RouteCollectorDecoratorAddonBase implements RouteCollectorDecoratorAddonIn
      * @param callable $callback
      */
     public function groupAddons(callable $callback,
-        RouteCollectorDecoratorAddonInterface $collector = null): HandlingInterface
+        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
     {
         return $this->addGroup('', $callback, $collector);
     }
 
     public function addGroup($prefix, callable $callback,
-        RouteCollectorDecoratorAddonInterface $collector = null): HandlingInterface
+        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
     {
         if (!$collector) { $collector = $this; }
 

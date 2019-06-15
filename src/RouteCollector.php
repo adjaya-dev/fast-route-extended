@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
-use Adjaya\FastRoute\Addon\RouteCollectorDecoratorAddonInterface;
 use Adjaya\FastRoute\DataGenerator\DataGeneratorInterface;
 use Adjaya\FastRoute\RouteParser\RouteParserInterface;
 use Exception;
@@ -69,7 +68,7 @@ class RouteCollector implements RouteCollectorInterface
      * @param string|array $prefix
      */
     public function addGroup($prefix, callable $callback, 
-        RouteCollectorDecoratorAddonInterface $collector = null): void
+        RouteCollectorDecoratorInterface $collector = null): void
     {
         if (!$collector) { $collector = $this; }
 

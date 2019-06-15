@@ -90,12 +90,10 @@ class AddonConfigurator implements AddonConfiguratorInterface
 
     public function provide(): array
     {
-        $options = $this->getOptions();
-
-        return [$this->addonClass => $options];
+        return [$this->addonClass => $this->getOptions()];
     }
 
-    protected function getOptions()
+    protected function getOptions(): array
     {
         $options['addons'] = $this->addons;
 
@@ -109,6 +107,5 @@ class AddonConfigurator implements AddonConfiguratorInterface
         }
 
         return $options;
-
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Adjaya\FastRoute\Addon;
 
 use Adjaya\FastRoute\RouteCollectorInterface;
+use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 use Adjaya\FastRoute\Handling\HandlingProviderInterface;
 use Adjaya\FastRoute\Handling\HandlingProvider;
 use Adjaya\FastRoute\Handling\HandlingInterface;
@@ -96,7 +97,7 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
      * @return HandlingInterface new instance of GroupHandling
      */
     public function addGroup($prefix, callable $callback,
-        RouteCollectorDecoratorAddonInterface $collector = null): HandlingInterface
+        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
     {
         if (!$collector) { $collector = $this; }
 

@@ -45,7 +45,7 @@ class Handling extends AbstractHandling implements HandlingInterface
         return $this->addons;
     }
 
-    public function setChild(HandlingInterface $child): void 
+    public function setChild(HandlingDecoratorInterface $child): void 
     {
         if ($this->ChildHandling) {
             throw new Exception(
