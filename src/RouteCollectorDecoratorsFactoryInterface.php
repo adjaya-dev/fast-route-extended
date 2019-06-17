@@ -8,7 +8,9 @@ interface RouteCollectorDecoratorsFactoryInterface
 {
     public function setDecoratorConfigurators(array $decorators): RouteCollectorDecoratorsFactoryInterface;
 
-    public function setDecoratorConfigurator(RouteCollectorDecoratorConfiguratorInterface $decorator):  RouteCollectorDecoratorsFactoryInterface;
+    public function setDecoratorConfigurator(
+        RouteCollectorDecoratorConfiguratorInterface $decorator
+    ):  RouteCollectorDecoratorsFactoryInterface;
 
     /**
      * Return RouteCollectorInterface || RouteCollectorDecoratorInterface

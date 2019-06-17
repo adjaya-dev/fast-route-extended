@@ -52,7 +52,7 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
             foreach ($macros as $name => $m) {
                 if (\is_callable($m)) {
                     if (is_array($m)) {
-                        $m = call_user_func_array($m);
+                        $m = call_user_func($m);
                     }
 
                     $this->setMacro($scope, $name, $m);

@@ -26,8 +26,9 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
         return $this;
     }
 
-    public function setDecoratorConfigurator(RouteCollectorDecoratorConfiguratorInterface $decorator):  RouteCollectorDecoratorsFactoryInterface
-    {
+    public function setDecoratorConfigurator(
+        RouteCollectorDecoratorConfiguratorInterface $decorator
+    ):  RouteCollectorDecoratorsFactoryInterface {
         $this->routeCollectorDecoratorConfigurators[] = $decorator;
 
         return $this;

@@ -24,7 +24,7 @@ class RouteHandlingDecoratorMacro extends HandlingDecoratorBase
         return parent::__call($method, $parameters);
     }
     
-    public static function __callStatic($method, $parameters): BadMethodCallException
+    public static function __callStatic($method, $parameters): void
     {
         parent::__callStatic($method, $parameters);
     }

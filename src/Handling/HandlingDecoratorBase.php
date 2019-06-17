@@ -39,7 +39,7 @@ class HandlingDecoratorBase implements HandlingDecoratorInterface
         return call_user_func_array(array($this->Handling, $method), $parameters);
     }
 
-    public static function __callStatic($method, $parameters): BadMethodCallException
+    public static function __callStatic($method, $parameters): void
     {
         throw new BadMethodCallException("Method __callStatic is not allowed, can't call {$method}");
     }

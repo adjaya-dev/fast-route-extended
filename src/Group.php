@@ -46,8 +46,14 @@ class Group
      * @param   array        $mergedRegex
      * @param   array        $mergedVariables
      */
-    public function __construct(string $id, string $regex, array $variables, ?string $parentId, array $mergedRegex, array $mergedVariables)
-    {
+    public function __construct(
+        string $id,
+        string $regex,
+        array $variables,
+        ?string $parentId,
+        array $mergedRegex,
+        array $mergedVariables
+    ) {
         $this->id = $id;
         $this->regex = $regex;
         $this->variables = $variables;
