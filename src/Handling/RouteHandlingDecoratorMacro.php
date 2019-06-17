@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-use BadMethodCallException;
-
 class RouteHandlingDecoratorMacro extends HandlingDecoratorBase
 {
     use \Spatie\Macroable\Macroable {
         __call as call;
         //__callStatic as callStatic;
     }
-    
+
     public function __call($method, $parameters)
     {
         if (static::hasMacro($method)) {
@@ -23,7 +21,7 @@ class RouteHandlingDecoratorMacro extends HandlingDecoratorBase
 
         return parent::__call($method, $parameters);
     }
-    
+
     public static function __callStatic($method, $parameters): void
     {
         parent::__callStatic($method, $parameters);

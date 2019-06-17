@@ -30,7 +30,7 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
     {
         $this->options = $options;
     }
-    
+
     public function getData(): array
     {
         return $this->RouteCollector->getData();
@@ -70,7 +70,7 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
         return $this->RouteCollector->getCurrentRouteId();
     }
 
-    public function get($route, $handler) : HandlingInterface
+    public function get($route, $handler): HandlingInterface
     {
         return $this->addRoute('GET', $route, $handler);
     }
@@ -99,7 +99,7 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
     {
         return $this->addRoute('HEAD', $route, $handler);
     }
-    
+
     public function any($route, $handler): HandlingInterface
     {
         return $this->addRoute('*', $route, $handler);

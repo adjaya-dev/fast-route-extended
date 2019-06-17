@@ -30,13 +30,13 @@ class HandlingDecoratorBase implements HandlingDecoratorInterface
         while ($handling instanceof HandlingDecoratorInterface) {
             $handling = $handling->getOriginalHandling();
         }
-        
+
         return $handling;
     }
 
     public function __call(string $method, array $parameters)
     {
-        return call_user_func_array(array($this->Handling, $method), $parameters);
+        return \call_user_func_array([$this->Handling, $method], $parameters);
     }
 
     public static function __callStatic($method, $parameters): void

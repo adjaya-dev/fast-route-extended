@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Addon;
 
-use Adjaya\FastRoute\RouteCollectorInterface;
-use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
-use Adjaya\FastRoute\Handling\HandlingProviderInterface;
-use Adjaya\FastRoute\Handling\HandlingProvider;
 use Adjaya\FastRoute\Handling\HandlingInterface;
-
+use Adjaya\FastRoute\Handling\HandlingProvider;
+use Adjaya\FastRoute\Handling\HandlingProviderInterface;
+use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
+use Adjaya\FastRoute\RouteCollectorInterface;
 use Exception;
 
 class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
@@ -73,17 +72,17 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
     {
         if (!($HandlingProvider instanceof HandlingProviderInterface)) {
             throw new Exception(
-                "HandlingProvider must be instance of HandlingProviderInterface"
+                'HandlingProvider must be instance of HandlingProviderInterface'
             );
         }
 
         $this->HandlingProvider = $HandlingProvider;
     }
-    
+
     public function getData(): array
     {
         $routes_data = $this->RouteCollector->getData();
-        
+
         if ($routes_data && isset($routes_data['routes_data']['info'])) {
             $this->HandlingProvider->processAddons($routes_data['routes_data']['info']);
         }
@@ -134,7 +133,7 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
     public function addRoute($httpMethod, $route, $handler): HandlingInterface
     {
         $RouteHandling = $this->beforeAddRoute();
-        
+
         $this->RouteCollector->addRoute($httpMethod, $route, $handler);
 
         return $this->afterAddRoute($RouteHandling);

@@ -12,13 +12,13 @@ interface RouteCollectorDecoratorInterface
 
     public function groupAddons(
         callable $callback,
-        RouteCollectorDecoratorInterface $collector = null
+        self $collector = null
     ): HandlingInterface;
 
     public function addGroup(
         $prefix,
         callable $callback,
-        RouteCollectorDecoratorInterface $collector = null
+        self $collector = null
     ): HandlingInterface;
 
     public function addRoute($httpMethod, $route, $handler): HandlingInterface;

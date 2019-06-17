@@ -37,14 +37,14 @@ class Group
     public $variablesMergedWithParents = [];
 
     /**
-     * Constructs a group
+     * Constructs a group.
      *
-     * @param   string       $id
-     * @param   string       $regex
-     * @param   array        $variables
-     * @param   string|null  $parentId
-     * @param   array        $mergedRegex
-     * @param   array        $mergedVariables
+     * @param string      $id
+     * @param string      $regex
+     * @param array       $variables
+     * @param string|null $parentId
+     * @param array       $mergedRegex
+     * @param array       $mergedVariables
      */
     public function __construct(
         string $id,
@@ -63,7 +63,7 @@ class Group
     }
 
     /**
-     * @return  array
+     * @return array
      */
     public function getMergedData(): array
     {
@@ -79,7 +79,8 @@ class Group
      */
     public function matches(string $str): bool
     {
-        $regex = '~^' . implode($this->regexMergedWithParents) . '$~';
+        $regex = '~^' . implode('', $this->regexMergedWithParents) . '$~';
+
         return (bool) preg_match($regex, $str);
     }
 }

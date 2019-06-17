@@ -15,8 +15,8 @@ interface DataGeneratorInterface
      * matches.
      *
      * @param string $httpMethod
-     * @param array $routeData
-     * @param mixed $handler
+     * @param array  $routeData
+     * @param mixed  $handler
      */
     public function addRoute($httpMethod, array $routeData, string $routeId, ?string $groupId = null);
 

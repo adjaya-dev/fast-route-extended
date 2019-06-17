@@ -9,7 +9,7 @@ use Exception;
 class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInterface
 {
     protected $scopes = ['auto', 'global', 'route', 'group'];
-    
+
     protected $macroableClass = HandlingProviderDecoratorMacroable::class;
 
     /**
@@ -18,7 +18,7 @@ class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInte
      *      'global' => [],
      *      'route'  => [],
      *      'group'  => [],
-     *  ]
+     *  ].
      *
      * @var array
      */
@@ -33,8 +33,8 @@ class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInte
 
     public function addMacros(string $scope, $macros): HandlingProviderDecoratorConfiguratorInterface
     {
-        if (in_array($scope, $this->scopes)) {
-            if ($scope === 'auto' && !$scope) { // Default true
+        if (\in_array($scope, $this->scopes, true)) {
+            if ('auto' === $scope && !$scope) { // Default true
                 $this->macros['auto'] = false;
             } else {
                 $this->macros[$scope] = (array) $macros;

@@ -49,7 +49,7 @@ class Handling extends AbstractHandling implements HandlingInterface
     {
         if ($this->ChildHandling) {
             throw new Exception(
-                "Child Handling is already set."
+                'Child Handling is already set.'
             );
         }
 
@@ -70,7 +70,7 @@ class Handling extends AbstractHandling implements HandlingInterface
     }
 
     /**
-     * @param array $_addons
+     * @param array         $_addons
      * @param array initial $addons_stack
      *
      * @return array udapted $addons_stack
@@ -78,10 +78,10 @@ class Handling extends AbstractHandling implements HandlingInterface
     protected function pushAddons(array $_addons, array $addons_stack = []): array
     {
         foreach ($_addons as $type => $addons) {
-            if (array_key_exists($type, $this->registeredAddons)) {
+            if (\array_key_exists($type, $this->registeredAddons)) {
                 if ($this->registeredAddons[$type] === $type) {
                     foreach ((array) $addons as $addon => $handlers) {
-                        if (is_string($addon)) {
+                        if (\is_string($addon)) {
                             $addons_stack[$type][$addon] = $handlers;
                         } else {
                             $addons_stack[$type][] = $handlers;
@@ -89,7 +89,7 @@ class Handling extends AbstractHandling implements HandlingInterface
                     }
                 } else {
                     foreach ($addons as $addon => $handlers) {
-                        if (in_array($addon, $this->registeredAddons[$type])) {
+                        if (\in_array($addon, $this->registeredAddons[$type], true)) {
                             foreach ((array) $handlers as $handler) {
                                 $addons_stack[$type][$addon][] = $handler;
                             }
@@ -110,16 +110,16 @@ class Handling extends AbstractHandling implements HandlingInterface
     public function add(array $addons): HandlingInterface
     {
         $this->addons = $this->pushAddons($addons, (array) $this->addons);
-        
+
         return $this->getChild();
     }
 
     /**
      * @param array|null &$addons
      */
-    protected function setHandlers(?array & $addons, ?string $id = null): void
+    protected function setHandlers(?array &$addons, ?string $id = null): void
     {
-        $this->addons = & $addons;
+        $this->addons = &$addons;
         $this->id = $id;
     }
 }

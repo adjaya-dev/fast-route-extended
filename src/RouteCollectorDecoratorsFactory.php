@@ -22,13 +22,13 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
         foreach ($decorators as $decorator) {
             $this->setDecoratorConfigurator($decorator);
         }
-        
+
         return $this;
     }
 
     public function setDecoratorConfigurator(
         RouteCollectorDecoratorConfiguratorInterface $decorator
-    ):  RouteCollectorDecoratorsFactoryInterface {
+    ): RouteCollectorDecoratorsFactoryInterface {
         $this->routeCollectorDecoratorConfigurators[] = $decorator;
 
         return $this;

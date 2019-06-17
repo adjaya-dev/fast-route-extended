@@ -24,30 +24,30 @@ class Router
      * @var callable
      */
     protected $routeDefinitionCallback;
-        
+
     /**
-     * Router options
+     * Router options.
      *
      * @var array
      */
     protected $options = [
-        'routeCollector'   => RouteCollector::class,
-        'routeParser'      => RouteParser\Std::class,
-        'dataGenerator'    => DataGenerator\MarkBased::class,
-        'dispatcher'       => Dispatcher\MarkBased::class,
-        'cacheDisabled'    => false,
+        'routeCollector'                  => RouteCollector::class,
+        'routeParser'                     => RouteParser\Std::class,
+        'dataGenerator'                   => DataGenerator\MarkBased::class,
+        'dispatcher'                      => Dispatcher\MarkBased::class,
+        'cacheDisabled'                   => false,
         'routeCollectorDecoratorsFactory' => RouteCollectorDecoratorsFactory::class,
     ];
 
     /**
-     * @param callable $routeDefinitionCallback
-     * @param null|array    $options
+     * @param callable   $routeDefinitionCallback
+     * @param array|null $options
      */
     public function __construct(callable $routeDefinitionCallback, ?array $options = [])
     {
         $this->routeDefinitionCallback = $routeDefinitionCallback;
 
-        $this->options =  $options + $this->options;
+        $this->options = $options + $this->options;
         /*/
         var_dump('************Router Options');
         echo '<pre>';
@@ -116,7 +116,7 @@ class Router
 
         return $dispatchData;
     }
-   
+
     /**
      * @param array &$dispatchData
      */
@@ -143,7 +143,7 @@ class Router
         }
         throw new LogicException('Dispatcher must be set first');
     }
-        
+
     protected function getDispatcher(array $dispatchData): Dispatcher\DispatcherInterface
     {
         $this->setRoutesData($dispatchData);
@@ -251,6 +251,6 @@ class Router
             ($this->options['routeParser'])::getReverseRouter($this->getReverseRoutesData());
         }
 
-        throw new RuntimeException($this->options['routeParser'].'::getReverseRouter does not exist');
+        throw new RuntimeException($this->options['routeParser'] . '::getReverseRouter does not exist');
     }
 }

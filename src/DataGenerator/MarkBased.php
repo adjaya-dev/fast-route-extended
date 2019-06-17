@@ -16,20 +16,20 @@ class MarkBased extends RegexBasedAbstract
         $routeMap = [];
         $regexes = [];
         $markIndex = 0;
- 
+
         foreach ($regexToRoutesMap as $regex => $_route) {
             // Allow Multiple routes matching same regex
             $routeStack = [];
             foreach ($_route as $key => $route) {
                 // il peux y avoir plusieurs routes avec la même regex
                 // donc on ne calcule la regex que pour la premiere!
-                if ($key === 0) {
+                if (0 === $key) {
                     if (!$route->groupId) {
                         $regexes[] = $regex . '(*:' . $markIndex . ')';
                     } else {
-                        $_regexes = & $regexes;
+                        $_regexes = &$regexes;
                         foreach ($route->prefixRegex as $prefix) {
-                            $_regexes = & $_regexes[$prefix];
+                            $_regexes = &$_regexes[$prefix];
                         }
                         $_regexes[] = $route->regex . '(*:' . $markIndex . ')';
                     }
@@ -37,12 +37,12 @@ class MarkBased extends RegexBasedAbstract
                 }
                 $routeStack[] = [$route->id, $route->variables];
             }
- 
+
             $routeMap[$markIndex] = $routeStack;
 
             ++$markIndex;
         }
-        
+
         $regex = '~^(?' . $this->regexToString($regexes) . ')$~';
 
         return ['regex' => $regex, 'routeMap' => $routeMap];
@@ -53,10 +53,10 @@ class MarkBased extends RegexBasedAbstract
         $regex = '';
 
         foreach ($regex_map as $k => $m) {
-            if (is_string($k) && is_array($m)) { // group
+            if (\is_string($k) && \is_array($m)) { // group
                 $regex .= sprintf("|$k(?%s)", $this->regexToString($m));
             } else { // route
-                $regex .= '|'.$m;
+                $regex .= '|' . $m;
             }
         }
 
@@ -69,7 +69,7 @@ class MarkBased extends RegexBasedAbstract
         $routeMap = [];
         $regexes = [];
         $markIndex = 0;
-        
+
         foreach ($regexToRoutesMap as $regex => $_route) {
             // Allow Multiple routes matching same regex
             $routeStack = [];
@@ -83,6 +83,7 @@ class MarkBased extends RegexBasedAbstract
         }
 
         $regex = '~^(?|' . implode('|', $regexes) . ')$~';
+
         return ['regex' => $regex, 'routeMap' => $routeMap];
     }
 }

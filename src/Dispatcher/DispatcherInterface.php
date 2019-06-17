@@ -21,7 +21,7 @@ interface DispatcherInterface
      *     [self::METHOD_NOT_ALLOWED, ['GET', 'OTHER_ALLOWED_METHODS']]
      *     [self::FOUND, ['Array of route params']]
      *
-     * @param string $uri
+     * @param string                  $uri
      * @param string RequestInterface $Request
      *
      * @return array

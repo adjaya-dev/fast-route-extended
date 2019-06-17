@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\DataGenerator;
 
-use Adjaya\FastRoute\Group;
 use Adjaya\FastRoute\Exception\BadRouteException;
+use Adjaya\FastRoute\Group;
 use Adjaya\FastRoute\Route;
 use Exception;
 
@@ -17,10 +17,10 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
 
     /** @var mixed[][] */
     protected $staticRoutes = [];
-    
+
     /** @var mixed[][] */
     protected $methodToRegexToRoutesMap = [];
-    
+
     /**
      * @return int
      */
@@ -61,7 +61,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
             $mergedVariables
         );
     }
-    
+
     public function getGroupData(string $groupId): array
     {
         return $this->groupsStack[$groupId]->getMergedData();
@@ -78,11 +78,12 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
 
     /**
      * @param mixed[]
+     *
      * @return bool
      */
     protected function isStatic(array $routeData): bool
     {
-        return count($routeData) === 1 && count($routeData[0]) === 1 && is_string($routeData[0][0]);
+        return 1 === \count($routeData) && 1 === \count($routeData[0]) && \is_string($routeData[0][0]);
     }
 
     private function addStaticRoute($httpMethod, string $routeStr, string $routeId): void
@@ -114,7 +115,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
 
         if ($groupId) {
             $prefix_regex_array = $this->groupsStack[$groupId]->regexMergedWithParents;
-            $group_regex_string = implode($prefix_regex_array);
+            $group_regex_string = implode('', $prefix_regex_array);
             // We search the regex of the road without the regex of the group.
             $route_regex_string = str_replace($group_regex_string, '', $route_regex_string);
         }
@@ -145,18 +146,20 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
 
     protected function buildRegexForGroup(array $groupData): array
     {
-        if (count($groupData) !== 1) {
+        if (1 !== \count($groupData)) {
             throw new BadRouteException(
                 'Cannot use optional placeholder in a group prefix'
             );
         }
 
         list($regex, $variables) = $this->buildRegex($groupData);
-        return [implode($regex), $variables];
+
+        return [implode('', $regex), $variables];
     }
 
     /**
      * @param mixed[]
+     *
      * @return mixed[]
      */
     private function buildRegexForRoute(array $routeData): array
@@ -165,10 +168,10 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         $reg_optional_start_f = '(?:%s';
         $reg_optional_end_f = ')?';
 
-        $count_optional = count($routeData) -1;
+        $count_optional = \count($routeData) - 1;
         if ($count_optional >= 1) { // optional segments
             $reg_f .=
-                str_repeat($reg_optional_start_f, $count_optional).
+                str_repeat($reg_optional_start_f, $count_optional) .
                 str_repeat($reg_optional_end_f, $count_optional);
         }
 
@@ -183,34 +186,33 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
     {
         $regex = [];
         $variables = [];
-   
+
         foreach ($data as $i => $segments) {
             $regex[$i] = '';
             foreach ($segments as $segment) {
-                if (is_string($segment)) {
+                if (\is_string($segment)) {
                     $regex[$i] .= preg_quote($segment);
                     continue;
-                } else {
-                    list($varName, $regexPart) = $segment;
+                }
+                list($varName, $regexPart) = $segment;
 
-                    if (isset($variables[$varName])) {
-                        throw new BadRouteException(sprintf(
+                if (isset($variables[$varName])) {
+                    throw new BadRouteException(sprintf(
                             'Cannot use the same placeholder "%s" twice',
                             $varName
                         ));
-                    }
+                }
 
-                    if ($this->regexHasCapturingGroups($regexPart)) {
-                        throw new BadRouteException(sprintf(
+                if ($this->regexHasCapturingGroups($regexPart)) {
+                    throw new BadRouteException(sprintf(
                             'Regex "%s" for parameter "%s" contains a capturing group',
                             $regexPart,
                             $varName
                         ));
-                    }
-
-                    $variables[$varName] = $varName;
-                    $regex[$i] .= '(' . $regexPart . ')';
                 }
+
+                $variables[$varName] = $varName;
+                $regex[$i] .= '(' . $regexPart . ')';
             }
         }
 
@@ -235,33 +237,37 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
     private function generateVariableRouteData()
     {
         $data = [];
-    
+
         foreach ($this->methodToRegexToRoutesMap as $method => $regexToRoutesMap) {
-            $chunkSize = $this->computeChunkSize(count($regexToRoutesMap));
+            $chunkSize = $this->computeChunkSize(\count($regexToRoutesMap));
             $chunks = array_chunk($regexToRoutesMap, $chunkSize, true);
             $data[$method] = array_map([$this, 'processChunk'], $chunks); // nouvelle methode
             //$data[$method] = array_map([$this, '_processChunk'], $chunks); // ancienne methode
         }
+
         return $data;
     }
 
     /**
      * @param int
+     *
      * @return int
      */
     private function computeChunkSize($count)
     {
         $numParts = max(1, round($count / $this->getApproxChunkSize()));
+
         return (int) ceil($count / $numParts);
     }
 
     /**
      * @param string
+     *
      * @return bool
      */
     private function regexHasCapturingGroups($regex)
     {
-        if (false === strpos($regex, '(')) {
+        if (false === mb_strpos($regex, '(')) {
             // Needs to have at least a ( to contain a capturing group
             return false;
         }

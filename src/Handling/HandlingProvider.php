@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-use ReflectionMethod;
 use Exception;
+use ReflectionMethod;
 
 class HandlingProvider implements HandlingProviderInterface
 {
@@ -40,7 +40,7 @@ class HandlingProvider implements HandlingProviderInterface
      * @var HandlingInterface current GroupHandling instance
      */
     protected $GroupHandling;
-    
+
     /**
      * @var ReflectionMethod RouteHandling::setHandlers
      */
@@ -59,7 +59,7 @@ class HandlingProvider implements HandlingProviderInterface
 
     public function __construct(?array $options = [])
     {
-        $this->routesAddonsDataCurrentIndex = & $this->routesAddonsData;
+        $this->routesAddonsDataCurrentIndex = &$this->routesAddonsData;
 
         $this->setOptions($options);
     }
@@ -94,7 +94,7 @@ class HandlingProvider implements HandlingProviderInterface
     protected function registerAddons(array $addons_stack): array
     {
         foreach ($addons_stack as $scope => $addons) {
-            if (!in_array($scope, self::$addonsScopes)) {
+            if (!\in_array($scope, self::$addonsScopes, true)) {
                 $mes = implode(' or ', self::$addonsScopes);
                 throw new Exception("Scope $scope not exists, must be $mes");
             }
@@ -111,12 +111,12 @@ class HandlingProvider implements HandlingProviderInterface
                 }
             }
 
-            if ($scope === 'route' || $scope === 'global') {
+            if ('route' === $scope || 'global' === $scope) {
                 $this->registeredAddons['route'] =
                     array_merge($this->registeredAddons['route'], $_addons);
             }
 
-            if ($scope === 'group' || $scope === 'global') {
+            if ('group' === $scope || 'global' === $scope) {
                 $this->registeredAddons['group'] =
                     array_merge($this->registeredAddons['group'], $_addons);
             }
@@ -125,7 +125,7 @@ class HandlingProvider implements HandlingProviderInterface
         return $_addons;
     }
 
-    public function processAddons(array & $routesData): void
+    public function processAddons(array &$routesData): void
     {
         /*
         var_dump('process addons');
@@ -133,12 +133,12 @@ class HandlingProvider implements HandlingProviderInterface
         print_r($this->routesAddonsData);
         echo '</pre>';
         //*/
-        
+
         $this->_processAddons($this->routesAddonsData, $routesData);
     }
 
     /**
-     * Recursive function
+     * Recursive function.
      *
      * @param array      $addonsData
      * @param array|null &$result
@@ -146,7 +146,7 @@ class HandlingProvider implements HandlingProviderInterface
      */
     protected function _processAddons(
         array $addonsData,
-        ?array & $result,
+        ?array &$result,
         array $current_addons = []
     ): void {
         foreach ($addonsData as $k => $v) {
@@ -165,7 +165,7 @@ class HandlingProvider implements HandlingProviderInterface
 
                 if (isset($group_addons)) {
                     array_unshift($group_addons, $result[$k]);
-                    $result[$k] = call_user_func_array('array_merge_recursive', $group_addons);
+                    $result[$k] = \call_user_func_array('array_merge_recursive', $group_addons);
                 }
             } else { // $v is numeric
                 $this->_processAddons($v, $result, $current_addons);
@@ -210,7 +210,7 @@ class HandlingProvider implements HandlingProviderInterface
 
             $this->setGroupHandlers->setAccessible(true);
         }
-    
+
         $this->GroupHandling = $O_GroupHandling =
             new GroupHandling($this->registeredAddons['group']);
 
@@ -234,8 +234,8 @@ class HandlingProvider implements HandlingProviderInterface
     }
 
     /**
-     * @param  HandlingInterface $RouteHandling
-     * @param  string            $route_id The current route id
+     * @param HandlingInterface $RouteHandling
+     * @param string            $route_id      The current route id
      *
      * @return HandlingInterface $RouteHandling
      */
@@ -252,11 +252,11 @@ class HandlingProvider implements HandlingProviderInterface
         $this->setRouteHandlers->invokeArgs(
             $O_RouteHandling,
             [
-                & $this->routesAddonsDataCurrentIndex[$route_id],
+                &$this->routesAddonsDataCurrentIndex[$route_id],
                 $route_id
             ]
         );
-       
+
         return $RouteHandling;
     }
 
@@ -265,12 +265,12 @@ class HandlingProvider implements HandlingProviderInterface
      */
     public function beforeAddGroup(): HandlingInterface
     {
-        $previousIdx = & $this->routesAddonsDataCurrentIndex;
+        $previousIdx = &$this->routesAddonsDataCurrentIndex;
 
         $this->routesAddonsDataCurrentIndex =
-        & $this->routesAddonsDataCurrentIndex[];
+        &$this->routesAddonsDataCurrentIndex[];
 
-        $previousIndex = & $this->groupsAddonsDataPreviousIndex();
+        $previousIndex = &$this->groupsAddonsDataPreviousIndex();
 
         $O_GroupHandling = $GroupHandling = $this->getGroupHandling();
 
@@ -281,33 +281,33 @@ class HandlingProvider implements HandlingProviderInterface
         $this->setGroupHandlers->invokeArgs(
             $O_GroupHandling,
             [
-                & $this->routesAddonsDataCurrentIndex['*addons*'],
-                'group_'.spl_object_id($GroupHandling)
+                &$this->routesAddonsDataCurrentIndex['*addons*'],
+                'group_' . spl_object_id($GroupHandling)
             ]
         );
 
-        $previousIndex[spl_object_id($GroupHandling)] = & $previousIdx;
+        $previousIndex[spl_object_id($GroupHandling)] = &$previousIdx;
 
         return $GroupHandling;
     }
-    
+
     /**
-     * @param  HandlingInterface $GroupHandling
+     * @param HandlingInterface $GroupHandling
      *
      * @return HandlingInterface $GroupHandling
      */
     public function afterAddGroup(HandlingInterface $GroupHandling): HandlingInterface
     {
         $this->routesAddonsDataCurrentIndex =
-            & $this->groupsAddonsDataPreviousIndex()[spl_object_id($GroupHandling)];
+            &$this->groupsAddonsDataPreviousIndex()[spl_object_id($GroupHandling)];
 
         return $GroupHandling;
     }
 
     /**
-     * @return  & array
+     * @return & array
      */
-    protected function & groupsAddonsDataPreviousIndex(): array
+    protected function &groupsAddonsDataPreviousIndex(): array
     {
         return self::$groupsAddonsDataPreviousIndex;
     }

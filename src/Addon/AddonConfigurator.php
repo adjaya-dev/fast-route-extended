@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Addon;
 
-use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 use Adjaya\FastRoute\Handling\HandlingProviderDecoratorConfiguratorInterface;
+use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 use Exception;
 
 class AddonConfigurator implements AddonConfiguratorInterface
@@ -17,7 +17,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
     protected $handlingProviderDecorators = [];
 
     /**
-     * Default Adjaya\FastRoute\Handling\HandlingProvider::class
+     * Default Adjaya\FastRoute\Handling\HandlingProvider::class.
      */
     protected $handlingProviderClass;
 
@@ -26,7 +26,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
      *      'global' => [],
      *      'route'  => [],
      *      'group'  => [],
-     *  ]
+     *  ].
      *
      * @var array
      */
@@ -59,7 +59,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
 
     public function addAddons(string $scope, array $addons): AddonConfiguratorInterface
     {
-        if (in_array($scope, $this->scopes)) {
+        if (\in_array($scope, $this->scopes, true)) {
             $this->addons[$scope] = $addons;
         }
 
@@ -79,7 +79,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
         }
 
         $this->handlingProviderDecorators[$class] = $params;
-        
+
         return $this;
     }
 

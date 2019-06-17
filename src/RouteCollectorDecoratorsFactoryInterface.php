@@ -6,14 +6,14 @@ namespace Adjaya\FastRoute;
 
 interface RouteCollectorDecoratorsFactoryInterface
 {
-    public function setDecoratorConfigurators(array $decorators): RouteCollectorDecoratorsFactoryInterface;
+    public function setDecoratorConfigurators(array $decorators): self;
 
     public function setDecoratorConfigurator(
         RouteCollectorDecoratorConfiguratorInterface $decorator
-    ):  RouteCollectorDecoratorsFactoryInterface;
+    ): self;
 
     /**
-     * Return RouteCollectorInterface || RouteCollectorDecoratorInterface
+     * Return RouteCollectorInterface || RouteCollectorDecoratorInterface.
      */
     public function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface;
 }

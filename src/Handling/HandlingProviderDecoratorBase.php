@@ -23,7 +23,7 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
         $this->HandlingProvider->setGroupHandlingDecorator($groupHandlingDecoratorClass);
     }
 
-    public function processAddons(array & $routesData): void
+    public function processAddons(array &$routesData): void
     {
         $this->HandlingProvider->processAddons($routesData);
     }

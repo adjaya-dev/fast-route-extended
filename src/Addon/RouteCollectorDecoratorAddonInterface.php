@@ -8,5 +8,4 @@ use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 
 interface RouteCollectorDecoratorAddonInterface extends RouteCollectorDecoratorInterface
 {
-
 }

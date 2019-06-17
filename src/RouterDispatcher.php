@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
-use FastRoute\Dispatcher;
 use Psr\Http\Message\RequestInterface;
 
 class RouterDispatcher implements DispatcherInterface

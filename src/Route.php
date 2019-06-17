@@ -35,16 +35,16 @@ class Route
      *  @var array
      */
     public $prefixRegex;
-    
+
     /**
      * Constructs a route (value object).
      *
-     * @param   string|array $httpMethod
-     * @param   string       $routeId
-     * @param   string       $regex
-     * @param   array        $variables
-     * @param   string|null  $groupId
-     * @param   array        $prefixRegex
+     * @param string|array $httpMethod
+     * @param string       $routeId
+     * @param string       $regex
+     * @param array        $variables
+     * @param string|null  $groupId
+     * @param array        $prefixRegex
      */
     public function __construct(
         $httpMethod,
@@ -71,7 +71,8 @@ class Route
      */
     public function matches(string $str): bool
     {
-        $regex = '~^' . implode($this->prefixRegex) . $this->regex . '$~';
+        $regex = '~^' . implode('', $this->prefixRegex) . $this->regex . '$~';
+
         return (bool) preg_match($regex, $str);
     }
 }

@@ -6,5 +6,4 @@ namespace Adjaya\FastRoute\Handling;
 
 class GroupHandling extends Handling
 {
-
 }

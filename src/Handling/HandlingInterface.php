@@ -6,7 +6,7 @@ namespace Adjaya\FastRoute\Handling;
 
 interface HandlingInterface
 {
-    public function getChild(): HandlingInterface;
+    public function getChild(): self;
 
-    public function add(array $addons): HandlingInterface;
+    public function add(array $addons): self;
 }

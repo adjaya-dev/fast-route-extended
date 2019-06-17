@@ -24,12 +24,12 @@ REGEX;
     public function parse($route)
     {
         $routeWithoutClosingOptionals = rtrim($route, ']');
-        $numOptionals = strlen($route) - strlen($routeWithoutClosingOptionals);
+        $numOptionals = \mb_strlen($route) - \mb_strlen($routeWithoutClosingOptionals);
 
         // Split on [ while skipping placeholders
         $segments = preg_split('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \[~x', $routeWithoutClosingOptionals);
 
-        if ($numOptionals !== count($segments) - 1) {
+        if ($numOptionals !== \count($segments) - 1) {
             // If there are any ] in the middle of the route, throw a more specific error message
             if (preg_match('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \]~x', $routeWithoutClosingOptionals)) {
                 throw new BadRouteException('Optional segments can only occur at the end of a route');
@@ -40,7 +40,7 @@ REGEX;
         $routeDatas = [];
 
         foreach ($segments as $n => $segment) {
-            if ($segment === '' && $n !== 0) {
+            if ('' === $segment && 0 !== $n) {
                 throw new BadRouteException('Empty optional part');
             }
 
@@ -54,6 +54,7 @@ REGEX;
      * Parses a route string that does not contain optional segments.
      *
      * @param string
+     *
      * @return mixed[]
      */
     private function parsePlaceholders($route)
@@ -71,17 +72,17 @@ REGEX;
         $routeData = [];
         foreach ($matches as $set) {
             if ($set[0][1] > $offset) {
-                $routeData[] = substr($route, $offset, $set[0][1] - $offset);
+                $routeData[] = mb_substr($route, $offset, $set[0][1] - $offset);
             }
             $routeData[] = [
                 $set[1][0],
                 isset($set[2]) ? trim($set[2][0]) : self::DEFAULT_DISPATCH_REGEX
             ];
-            $offset = $set[0][1] + strlen($set[0][0]);
+            $offset = $set[0][1] + \mb_strlen($set[0][0]);
         }
 
-        if ($offset !== strlen($route)) {
-            $routeData[] = substr($route, $offset);
+        if ($offset !== \mb_strlen($route)) {
+            $routeData[] = mb_substr($route, $offset);
         }
 
         return $routeData;

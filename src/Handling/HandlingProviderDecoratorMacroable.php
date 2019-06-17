@@ -40,19 +40,19 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
     }
 
     /**
-     * @param array  $macroables
+     * @param array $macroables
      */
     protected function setMacroables(array $macroables): void
     {
         foreach ($macroables as $scope => $macros) {
-            if (!in_array($scope, ['global', 'route', 'group'])) {
+            if (!\in_array($scope, ['global', 'route', 'group'], true)) {
                 throw new Exception("$scope not exists, must be 'global', 'route', or 'group'");
             }
 
             foreach ($macros as $name => $m) {
                 if (\is_callable($m)) {
-                    if (is_array($m)) {
-                        $m = call_user_func($m);
+                    if (\is_array($m)) {
+                        $m = \call_user_func($m);
                     }
 
                     $this->setMacro($scope, $name, $m);
@@ -69,7 +69,7 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
                     $methods = (new \ReflectionClass($m))->getMethods(
                         \ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED
                     );
-            
+
                     foreach ($methods as $method) {
                         $method->setAccessible(true);
 
@@ -94,7 +94,7 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
     /**
      * Built chainable macros.
      *
-     * @param   array  $_addons
+     * @param array $_addons
      */
     protected function builtAddonsMacros(array $_addons): void
     {

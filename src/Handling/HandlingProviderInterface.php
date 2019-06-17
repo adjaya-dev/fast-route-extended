@@ -9,10 +9,10 @@ interface HandlingProviderInterface
     public function getRegisteredAddons(): array;
 
     public function setRouteHandlingDecorator(string $routeHandlingDecoratorClass);
-    
+
     public function setGroupHandlingDecorator(string $GroupHandlingDecoratorClass);
 
-    public function processAddons(array & $routesData): void;
+    public function processAddons(array &$routesData): void;
 
     public function beforeAddRoute(): HandlingInterface;
 
