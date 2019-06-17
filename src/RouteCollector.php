@@ -67,10 +67,14 @@ class RouteCollector implements RouteCollectorInterface
      *
      * @param string|array $prefix
      */
-    public function addGroup($prefix, callable $callback, 
-        RouteCollectorDecoratorInterface $collector = null): void
-    {
-        if (!$collector) { $collector = $this; }
+    public function addGroup(
+        $prefix,
+        callable $callback,
+        RouteCollectorDecoratorInterface $collector = null
+    ): void {
+        if (!$collector) {
+            $collector = $this;
+        }
 
         if (\is_array($prefix)) {
             $group_name = key($prefix);
@@ -87,7 +91,7 @@ class RouteCollector implements RouteCollectorInterface
         $previousGroupPrefix = $this->currentGroupPrefix;
         $this->currentGroupPrefix = $previousGroupPrefix . $prefix;
 
-        if ($prefix) { 
+        if ($prefix) {
             $previousGroupId = $this->currentGroupId;
 
             $this->currentGroupId = $this->groupIdPrefix .$this->groupIdCount++;
@@ -99,7 +103,7 @@ class RouteCollector implements RouteCollectorInterface
 
         $callback($collector);
         
-        if ($prefix) { 
+        if ($prefix) {
             $this->currentGroupId = $previousGroupId;
         }
         
@@ -111,7 +115,7 @@ class RouteCollector implements RouteCollectorInterface
      * {@inheritdoc}
      *
      * @param string|array $route
-     * 
+     *
      * @return string $route_id
      */
     public function addRoute($httpMethod, $route, $handler): void
@@ -137,7 +141,6 @@ class RouteCollector implements RouteCollectorInterface
 
         /** PARSE REVERSE */
         if ($route_name && method_exists($this->routeParser, 'parseReverse')) {
-
             if (isset($this->routesData['reverse']) &&
                 \in_array($route_name, $this->routesData['reverse'], true)
             ) {
@@ -155,19 +158,19 @@ class RouteCollector implements RouteCollectorInterface
         $this->routesData['info'][$this->currentRouteId]['handler'] = $handler;
     }
 
-    public function getCurrentRouteId(): string 
+    public function getCurrentRouteId(): string
     {
         return $this->currentRouteId;
     }
 
-    public function getCurrentGroupId(): ?string 
+    public function getCurrentGroupId(): ?string
     {
         return $this->currentGroupId;
     }
 
     /**
      * Adds a GET route to the collection
-     * 
+     *
      * This is simply an alias of $this->addRoute('GET', $route, $handler)
      *
      * @param string $route
@@ -176,11 +179,11 @@ class RouteCollector implements RouteCollectorInterface
     public function get($route, $handler)
     {
         $this->addRoute('GET', $route, $handler);
-    }    
+    }
 
     /**
      * Adds a POST route to the collection
-     * 
+     *
      * This is simply an alias of $this->addRoute('POST', $route, $handler)
      *
      * @param string $route
@@ -193,7 +196,7 @@ class RouteCollector implements RouteCollectorInterface
 
     /**
      * Adds a PUT route to the collection
-     * 
+     *
      * This is simply an alias of $this->addRoute('PUT', $route, $handler)
      *
      * @param string $route
@@ -206,7 +209,7 @@ class RouteCollector implements RouteCollectorInterface
 
     /**
      * Adds a DELETE route to the collection
-     * 
+     *
      * This is simply an alias of $this->addRoute('DELETE', $route, $handler)
      *
      * @param string $route
@@ -219,7 +222,7 @@ class RouteCollector implements RouteCollectorInterface
 
     /**
      * Adds a PATCH route to the collection
-     * 
+     *
      * This is simply an alias of $this->addRoute('PATCH', $route, $handler)
      *
      * @param string $route

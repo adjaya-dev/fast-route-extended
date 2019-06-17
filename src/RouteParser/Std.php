@@ -45,7 +45,6 @@ REGEX;
             }
 
             $routeDatas[] = $this->parsePlaceholders($segment);
-
         }
 
         return $routeDatas;
@@ -60,7 +59,9 @@ REGEX;
     private function parsePlaceholders($route)
     {
         if (!preg_match_all(
-            '~' . self::VARIABLE_REGEX . '~x', $route, $matches,
+            '~' . self::VARIABLE_REGEX . '~x',
+            $route,
+            $matches,
             PREG_OFFSET_CAPTURE | PREG_SET_ORDER
         )) {
             return [$route];
@@ -102,8 +103,7 @@ REGEX;
     public static function getReverseFunction(): callable
     {
         return
-        function (array $reverse, ?array ...$params): string 
-        {
+        function (array $reverse, ?array ...$params): string {
             //if (!$reverse) { throw new RuntimeException('Bad argument type.'); }
             $vars = [];
             $literal = true;

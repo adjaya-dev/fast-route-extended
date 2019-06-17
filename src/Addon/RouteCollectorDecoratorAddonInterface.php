@@ -6,4 +6,7 @@ namespace Adjaya\FastRoute\Addon;
 
 use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 
-interface RouteCollectorDecoratorAddonInterface extends RouteCollectorDecoratorInterface {}
+interface RouteCollectorDecoratorAddonInterface extends RouteCollectorDecoratorInterface
+{
+
+}

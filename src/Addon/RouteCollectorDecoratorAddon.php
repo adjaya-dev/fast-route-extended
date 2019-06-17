@@ -23,7 +23,9 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
     {
         $this->RouteCollector = $RouteCollector;
 
-        if (!empty($options)) { $this->setOptions($options); }
+        if (!empty($options)) {
+            $this->setOptions($options);
+        }
     }
 
     /**
@@ -55,19 +57,19 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
         }
     }
 
-    protected function setHandlingProvider(string $handlingProvider, array $options): void 
+    protected function setHandlingProvider(string $handlingProvider, array $options): void
     {
         if (!$this->HandlingProvider) {
             $this->validateHandlingProvider(new $handlingProvider($options));
         }
     }
 
-    protected function setHandlingProviderDecorator(string $decorator, array $options) 
+    protected function setHandlingProviderDecorator(string $decorator, array $options)
     {
         $this->validateHandlingProvider(new $decorator($this->HandlingProvider, $options));
     }
 
-    protected function validateHandlingProvider($HandlingProvider) 
+    protected function validateHandlingProvider($HandlingProvider)
     {
         if (!($HandlingProvider instanceof HandlingProviderInterface)) {
             throw new Exception(
@@ -96,10 +98,14 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
      *
      * @return HandlingInterface new instance of GroupHandling
      */
-    public function addGroup($prefix, callable $callback,
-        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
-    {
-        if (!$collector) { $collector = $this; }
+    public function addGroup(
+        $prefix,
+        callable $callback,
+        RouteCollectorDecoratorInterface $collector = null
+    ): HandlingInterface {
+        if (!$collector) {
+            $collector = $this;
+        }
 
         $GroupHandling = $this->beforeAddGroup();
 
@@ -110,12 +116,12 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
 
     protected function beforeAddGroup(): HandlingInterface
     {
-        return $this->HandlingProvider->beforeAddGroup();    
+        return $this->HandlingProvider->beforeAddGroup();
     }
 
     protected function afterAddGroup(HandlingInterface $GroupHandling): HandlingInterface
     {
-        return $this->HandlingProvider->afterAddGroup($GroupHandling);    
+        return $this->HandlingProvider->afterAddGroup($GroupHandling);
     }
 
     /**
@@ -136,12 +142,12 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
 
     protected function beforeAddRoute(): HandlingInterface
     {
-        return $this->HandlingProvider->beforeAddRoute();    
+        return $this->HandlingProvider->beforeAddRoute();
     }
 
     protected function afterAddRoute(HandlingInterface $RouteHandling): HandlingInterface
     {
-        return 
+        return
         $this->HandlingProvider->afterAddRoute($RouteHandling, $this->RouteCollector->getCurrentRouteId());
     }
 }

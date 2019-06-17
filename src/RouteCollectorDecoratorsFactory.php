@@ -12,15 +12,14 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
 
     protected $routeCollector;
 
-    public function __construct(array $routeCollectorDecoratorConfigurators = []) 
+    public function __construct(array $routeCollectorDecoratorConfigurators = [])
     {
         $this->setDecoratorConfigurators($routeCollectorDecoratorConfigurators);
     }
 
     public function setDecoratorConfigurators(array $decorators): RouteCollectorDecoratorsFactoryInterface
     {
-        foreach ($decorators as $decorator) 
-        {
+        foreach ($decorators as $decorator) {
             $this->setDecoratorConfigurator($decorator);
         }
         
@@ -36,8 +35,7 @@ class RouteCollectorDecoratorsFactory implements RouteCollectorDecoratorsFactory
 
     public function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface
     {
-        foreach ($this->routeCollectorDecoratorConfigurators as $configurator) 
-        {
+        foreach ($this->routeCollectorDecoratorConfigurators as $configurator) {
             $RouteCollector = $configurator->decorate($RouteCollector);
         }
 

@@ -6,15 +6,20 @@ namespace Adjaya\FastRoute;
 
 use Adjaya\FastRoute\Handling\HandlingInterface;
 
-interface RouteCollectorDecoratorInterface 
+interface RouteCollectorDecoratorInterface
 {
     public function getData(): array;
 
     public function groupAddons(
-        callable $callback, RouteCollectorDecoratorInterface $collector = null): HandlingInterface;
+        callable $callback,
+        RouteCollectorDecoratorInterface $collector = null
+    ): HandlingInterface;
 
-    public function addGroup($prefix, callable $callback, 
-        RouteCollectorDecoratorInterface $collector = null): HandlingInterface;
+    public function addGroup(
+        $prefix,
+        callable $callback,
+        RouteCollectorDecoratorInterface $collector = null
+    ): HandlingInterface;
 
     public function addRoute($httpMethod, $route, $handler): HandlingInterface;
 

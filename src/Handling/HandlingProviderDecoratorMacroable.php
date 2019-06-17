@@ -34,8 +34,7 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 
     protected function setOptions(array $macros): void
     {
-        if (!empty($macros)) 
-        {
+        if (!empty($macros)) {
             $this->setMacroables($macros);
         }
     }
@@ -45,16 +44,13 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
      */
     protected function setMacroables(array $macroables): void
     {
-        foreach ($macroables as $scope => $macros) 
-        {
+        foreach ($macroables as $scope => $macros) {
             if (!in_array($scope, ['global', 'route', 'group'])) {
-                throw new Exception("$scope not exists, must be 'global', 'route', or 'group'"); 
+                throw new Exception("$scope not exists, must be 'global', 'route', or 'group'");
             }
 
-            foreach ($macros as $name => $m) 
-            {
-                if (\is_callable($m)) 
-                {
+            foreach ($macros as $name => $m) {
+                if (\is_callable($m)) {
                     if (is_array($m)) {
                         $m = call_user_func_array($m);
                     }
@@ -77,18 +73,18 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
                     foreach ($methods as $method) {
                         $method->setAccessible(true);
 
-                        $this->setMacro($scope, $method->name, $method->invoke($m)); 
+                        $this->setMacro($scope, $method->name, $method->invoke($m));
                     }
                 }
             }
         }
     }
 
-    protected function setMacro(string $scope, string $name, \Closure $macro): void 
+    protected function setMacro(string $scope, string $name, \Closure $macro): void
     {
         if ('global' === $scope || 'route' === $scope) {
             RouteHandlingDecoratorMacro::macro($name, $macro);
-        } 
+        }
 
         if ('global' === $scope || 'group' === $scope) {
             GroupHandlingDecoratorMacro::macro($name, $macro);
@@ -97,20 +93,18 @@ class HandlingProviderDecoratorMacroable extends HandlingProviderDecoratorBase
 
     /**
      * Built chainable macros.
-     * 
+     *
      * @param   array  $_addons
      */
-    protected function builtAddonsMacros(array $_addons): void 
+    protected function builtAddonsMacros(array $_addons): void
     {
-        foreach ($_addons as $scope => $addons) 
-        {
+        foreach ($_addons as $scope => $addons) {
             if (!isset($this->getRegisteredAddons()[$scope])) {
-                $s = implode (' or ',  array_keys($this->getRegisteredAddons()));
+                $s = implode(' or ', array_keys($this->getRegisteredAddons()));
                 throw new Exception("$scope is not allowed. Allowed : $s.");
             }
 
-            foreach ($addons as $name => $v) 
-            {
+            foreach ($addons as $name => $v) {
                 if ($name === $v) {
                     $macro = function ($arg) use ($name) {
                         $this->add([$name => $arg]);

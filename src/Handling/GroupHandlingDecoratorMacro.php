@@ -6,10 +6,10 @@ namespace Adjaya\FastRoute\Handling;
 
 use BadMethodCallException;
 
-class GroupHandlingDecoratorMacro extends HandlingDecoratorBase 
+class GroupHandlingDecoratorMacro extends HandlingDecoratorBase
 {
-    use \Spatie\Macroable\Macroable { 
-        __call as call; 
+    use \Spatie\Macroable\Macroable {
+        __call as call;
         //__callStatic as callStatic;
     }
     

@@ -13,5 +13,5 @@ interface RouteCollectorDecoratorsFactoryInterface
     /**
      * Return RouteCollectorInterface || RouteCollectorDecoratorInterface
      */
-    public function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface;     
+    public function decorate(RouteCollectorInterface $RouteCollector): RouteCollectorDecoratorInterface;
 }

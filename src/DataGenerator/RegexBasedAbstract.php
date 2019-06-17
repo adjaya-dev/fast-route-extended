@@ -36,14 +36,14 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         $this->identicalsRegexRoutes = $allow;
     }
 
-    public function addGroup(array $groupData, string $groupId, ?string $parentGroupId): void 
+    public function addGroup(array $groupData, string $groupId, ?string $parentGroupId): void
     {
         list($groupRegex, $groupVariables) = $this->buildRegexForGroup($groupData);
 
         $mergedRegex = (array) $groupRegex;
         $mergedVariables = $groupVariables;
 
-        if ($parentGroupId) { 
+        if ($parentGroupId) {
             $parentGroup = $this->groupsStack[$parentGroupId];
             $parentsRegex = $parentGroup->regexMergedWithParents;
             $parentsVariables = $parentGroup->variablesMergedWithParents;
@@ -53,16 +53,21 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         }
 
         $this->groupsStack[$groupId] = new Group(
-            $groupId, $groupRegex, $groupVariables, $parentGroupId, $mergedRegex, $mergedVariables
+            $groupId,
+            $groupRegex,
+            $groupVariables,
+            $parentGroupId,
+            $mergedRegex,
+            $mergedVariables
         );
     }
     
-    public function getGroupData(string $groupId): array 
+    public function getGroupData(string $groupId): array
     {
         return $this->groupsStack[$groupId]->getMergedData();
     }
 
-    public function addRoute($httpMethod, array $routeData, string $routeId, ?string $groupId = null) 
+    public function addRoute($httpMethod, array $routeData, string $routeId, ?string $groupId = null)
     {
         if ($this->isStatic($routeData)) {
             $this->addStaticRoute($httpMethod, $routeData[0][0], $routeId);
@@ -75,21 +80,19 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
      * @param mixed[]
      * @return bool
      */
-    protected function isStatic(array $routeData): bool 
+    protected function isStatic(array $routeData): bool
     {
-        return count($routeData) === 1 && count($routeData[0]) === 1 && is_string($routeData[0][0]);    
+        return count($routeData) === 1 && count($routeData[0]) === 1 && is_string($routeData[0][0]);
     }
 
     private function addStaticRoute($httpMethod, string $routeStr, string $routeId): void
     {
-        foreach((array) $httpMethod as $method) 
-        {
-            if ( // Allow Multiple routes matching same regex ?
-                !$this->identicalsRegexRoutes 
-                && 
+        foreach ((array) $httpMethod as $method) {
+            if (// Allow Multiple routes matching same regex ?
+                !$this->identicalsRegexRoutes
+                &&
                 isset($this->staticRoutes[$method][$routeStr])
-            ) 
-            {
+            ) {
                 throw new Exception('
                     Identicals regular expressions for multiple routes are not allowed.
                     You can set this option to true if you want, 
@@ -98,7 +101,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
             }
 
             $this->staticRoutes[$method][$routeStr][] = $routeId;
-        } 
+        }
     }
 
     protected function addVariableRoute($httpMethod, array $routeData, string $routeId, ?string $groupId)
@@ -116,14 +119,12 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
             $route_regex_string = str_replace($group_regex_string, '', $route_regex_string);
         }
 
-        foreach((array) $httpMethod as $method) 
-        {
-            if ( // Allow Multiple routes matching same regex ?
-                !$this->identicalsRegexRoutes 
-                && 
+        foreach ((array) $httpMethod as $method) {
+            if (// Allow Multiple routes matching same regex ?
+                !$this->identicalsRegexRoutes
+                &&
                 isset($this->methodToRegexToRoutesMap[$method][$route_regex])
-            )
-            {
+            ) {
                 throw new Exception('
                     Identicals regular expressions for multiple routes are not allowed.
                     You can set this option to true if you want, 
@@ -131,8 +132,13 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
                 ');
             }
 
-            $this->methodToRegexToRoutesMap[$method][$route_regex][] = new Route( 
-                $method, $routeId, $route_regex_string, $variables, $groupId, $prefix_regex_array
+            $this->methodToRegexToRoutesMap[$method][$route_regex][] = new Route(
+                $method,
+                $routeId,
+                $route_regex_string,
+                $variables,
+                $groupId,
+                $prefix_regex_array
             );
         }
     }
@@ -141,7 +147,8 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
     {
         if (count($groupData) !== 1) {
             throw new BadRouteException(
-                'Cannot use optional placeholder in a group prefix');       
+                'Cannot use optional placeholder in a group prefix'
+            );
         }
 
         list($regex, $variables) = $this->buildRegex($groupData);
@@ -159,9 +166,8 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         $reg_optional_end_f = ')?';
 
         $count_optional = count($routeData) -1;
-        if ($count_optional >= 1) // optional segments
-        {
-            $reg_f .= 
+        if ($count_optional >= 1) { // optional segments
+            $reg_f .=
                 str_repeat($reg_optional_start_f, $count_optional).
                 str_repeat($reg_optional_end_f, $count_optional);
         }
@@ -178,11 +184,9 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         $regex = [];
         $variables = [];
    
-        foreach ($data as $i => $segments) 
-        {
+        foreach ($data as $i => $segments) {
             $regex[$i] = '';
             foreach ($segments as $segment) {
-                
                 if (is_string($segment)) {
                     $regex[$i] .= preg_quote($segment);
                     continue;
@@ -191,14 +195,16 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
 
                     if (isset($variables[$varName])) {
                         throw new BadRouteException(sprintf(
-                            'Cannot use the same placeholder "%s" twice', $varName
+                            'Cannot use the same placeholder "%s" twice',
+                            $varName
                         ));
                     }
 
                     if ($this->regexHasCapturingGroups($regexPart)) {
                         throw new BadRouteException(sprintf(
                             'Regex "%s" for parameter "%s" contains a capturing group',
-                            $regexPart, $varName
+                            $regexPart,
+                            $varName
                         ));
                     }
 

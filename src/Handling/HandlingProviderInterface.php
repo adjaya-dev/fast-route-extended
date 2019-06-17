@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-interface HandlingProviderInterface 
+interface HandlingProviderInterface
 {
-    public function getRegisteredAddons(): array; 
+    public function getRegisteredAddons(): array;
 
     public function setRouteHandlingDecorator(string $routeHandlingDecoratorClass);
     

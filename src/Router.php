@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
-use Closure;
 use Exception;
 use LogicException;
 use RuntimeException;
@@ -81,8 +80,7 @@ class Router
     {
         $routeCollector = $this->getRouteCollector();
 
-        if (isset($this->options['routeCollectorDecorators']) && $this->options['routeCollectorDecorators'])
-        {
+        if (isset($this->options['routeCollectorDecorators']) && $this->options['routeCollectorDecorators']) {
             $routeCollector = $this->getDecoratedRouteCollector($routeCollector);
         }
 
@@ -153,7 +151,7 @@ class Router
         return new $this->options['dispatcher']($dispatchData, $this->routesData);
     }
 
-    protected function getRouteCollector(): RouteCollectorInterface 
+    protected function getRouteCollector(): RouteCollectorInterface
     {
         return new $this->options['routeCollector'](
                 $this->getRouteParser(),
@@ -161,7 +159,7 @@ class Router
             );
     }
 
-    protected function getRouteParser(): RouteParser\RouteParserInterface  
+    protected function getRouteParser(): RouteParser\RouteParserInterface
     {
         return new $this->options['routeParser']();
     }
@@ -170,8 +168,7 @@ class Router
     {
         $DataGenerator = new $this->options['dataGenerator']();
 
-        if (isset($options['allowIdenticalRegexRoutes']) && !$options['allowIdenticalRegexRoutes']) 
-        { // Default true
+        if (isset($options['allowIdenticalRegexRoutes']) && !$options['allowIdenticalRegexRoutes']) { // Default true
             $DataGenerator->allowIdenticalsRegexRoutes(false);
         }
 
@@ -180,14 +177,13 @@ class Router
 
     protected function getDecoratedRouteCollector(
         RouteCollectorInterface $routeCollector
-    ): RouteCollectorDecoratorInterface 
-    {
+    ): RouteCollectorDecoratorInterface {
         return $this->getRouteCollectorDecoratorsFactory()->decorate($routeCollector);
     }
 
     protected function getRouteCollectorDecoratorsFactory(): RouteCollectorDecoratorsFactoryInterface
     {
-        return 
+        return
             new $this->options['routeCollectorDecoratorsFactory'](
                 $this->getRouteCollectorDecoratorConfigurators()
             );
@@ -218,7 +214,8 @@ class Router
         return $this->routesData;
     }
 
-    public function getRoutesInfo(): array {
+    public function getRoutesInfo(): array
+    {
         return $this->routesData['info'];
     }
 
@@ -249,9 +246,8 @@ class Router
      */
     public function getReverseRouter(): ReverseRouter
     {
-        if (method_exists($this->options['routeParser'], 'getReverseRouter')) 
-        {
-            return 
+        if (method_exists($this->options['routeParser'], 'getReverseRouter')) {
+            return
             ($this->options['routeParser'])::getReverseRouter($this->getReverseRoutesData());
         }
 

@@ -15,15 +15,18 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
 
     protected $options;
 
-    public function __construct(RouteCollectorDecoratorInterface $RouteCollector,
-        ?array $options = null)
-    {
+    public function __construct(
+        RouteCollectorDecoratorInterface $RouteCollector,
+        ?array $options = null
+    ) {
         $this->RouteCollector = $RouteCollector;
 
-        if (!empty($options)) { $this->setOptions($options); }
+        if (!empty($options)) {
+            $this->setOptions($options);
+        }
     }
 
-    protected function setOptions(array $options): void 
+    protected function setOptions(array $options): void
     {
         $this->options = $options;
     }
@@ -35,19 +38,24 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
 
     /**
      * Create an addons group.
-     * 
+     *
      * @param callable $callback
      */
-    public function groupAddons(callable $callback,
-        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
-    {
+    public function groupAddons(
+        callable $callback,
+        RouteCollectorDecoratorInterface $collector = null
+    ): HandlingInterface {
         return $this->addGroup('', $callback, $collector);
     }
 
-    public function addGroup($prefix, callable $callback,
-        RouteCollectorDecoratorInterface $collector = null): HandlingInterface
-    {
-        if (!$collector) { $collector = $this; }
+    public function addGroup(
+        $prefix,
+        callable $callback,
+        RouteCollectorDecoratorInterface $collector = null
+    ): HandlingInterface {
+        if (!$collector) {
+            $collector = $this;
+        }
 
         return $this->RouteCollector->addGroup($prefix, $callback, $collector);
     }
@@ -57,36 +65,43 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
         return $this->RouteCollector->addRoute($httpMethod, $route, $handler);
     }
 
-    public function getCurrentRouteId(): string 
+    public function getCurrentRouteId(): string
     {
         return $this->RouteCollector->getCurrentRouteId();
     }
 
-    public function get($route, $handler) : HandlingInterface {
+    public function get($route, $handler) : HandlingInterface
+    {
         return $this->addRoute('GET', $route, $handler);
     }
 
-    public function post($route, $handler): HandlingInterface {
+    public function post($route, $handler): HandlingInterface
+    {
         return $this->addRoute('POST', $route, $handler);
     }
 
-    public function put($route, $handler): HandlingInterface {
+    public function put($route, $handler): HandlingInterface
+    {
         return $this->addRoute('PUT', $route, $handler);
     }
 
-    public function delete($route, $handler): HandlingInterface {
+    public function delete($route, $handler): HandlingInterface
+    {
         return $this->addRoute('DELETE', $route, $handler);
     }
 
-    public function patch($route, $handler): HandlingInterface {
-        return $this->addRoute('PATCH', $route,$handler);
+    public function patch($route, $handler): HandlingInterface
+    {
+        return $this->addRoute('PATCH', $route, $handler);
     }
 
-    public function head($route, $handler): HandlingInterface {
+    public function head($route, $handler): HandlingInterface
+    {
         return $this->addRoute('HEAD', $route, $handler);
     }
     
-    public function any($route, $handler): HandlingInterface {
+    public function any($route, $handler): HandlingInterface
+    {
         return $this->addRoute('*', $route, $handler);
     }
 }

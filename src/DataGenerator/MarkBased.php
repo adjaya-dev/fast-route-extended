@@ -18,7 +18,6 @@ class MarkBased extends RegexBasedAbstract
         $markIndex = 0;
  
         foreach ($regexToRoutesMap as $regex => $_route) {
-            
             // Allow Multiple routes matching same regex
             $routeStack = [];
             foreach ($_route as $key => $route) {
@@ -49,7 +48,7 @@ class MarkBased extends RegexBasedAbstract
         return ['regex' => $regex, 'routeMap' => $routeMap];
     }
 
-    protected function regexToString(array $regex_map): string 
+    protected function regexToString(array $regex_map): string
     {
         $regex = '';
 

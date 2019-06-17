@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-interface HandlingInterface 
+interface HandlingInterface
 {
     public function getChild(): HandlingInterface;
 

@@ -6,33 +6,33 @@ namespace Adjaya\FastRoute;
 
 class Route
 {
-    /** 
-     * @var string|array 
+    /**
+     * @var string|array
      */
     public $httpMethod;
 
-    /** 
-     * @var string 
+    /**
+     * @var string
      */
     public $regex;
 
-    /** 
-     * @var array 
+    /**
+     * @var array
      */
     public $variables;
 
-    /** 
-     * @var string 
+    /**
+     * @var string
      */
     public $id;
 
-    /** 
-     * @var string|null 
+    /**
+     * @var string|null
      */
     public $groupId;
 
     /**
-     *  @var array 
+     *  @var array
      */
     public $prefixRegex;
     
@@ -47,9 +47,13 @@ class Route
      * @param   array        $prefixRegex
      */
     public function __construct(
-        $httpMethod, string $routeId, string $regex, array $variables, ?string $groupId, array $prefixRegex
-    )
-    {
+        $httpMethod,
+        string $routeId,
+        string $regex,
+        array $variables,
+        ?string $groupId,
+        array $prefixRegex
+    ) {
         $this->httpMethod = $httpMethod;
         $this->id = $routeId;
         $this->regex = $regex;

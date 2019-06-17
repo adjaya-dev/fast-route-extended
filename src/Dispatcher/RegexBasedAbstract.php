@@ -26,13 +26,13 @@ abstract class RegexBasedAbstract implements DispatcherInterface
         // Allow Multiple routes matching same regex
         $routes = [];
         foreach ($routeData as $key => $route_id) {
-            $routes[] = [$route_id, []];  
+            $routes[] = [$route_id, []];
         }
         
         return [self::FOUND, $routes];
     }
 
-    public function dispatch($httpMethod, $uri, ?RequestInterface $Request = null): array 
+    public function dispatch($httpMethod, $uri, ?RequestInterface $Request = null): array
     {
         $result = $this->_dispatch($httpMethod, $uri);
         switch ($result[0]) {
@@ -55,10 +55,11 @@ abstract class RegexBasedAbstract implements DispatcherInterface
 
     protected function _dispatch($httpMethod, $uri)
     {
-        if ($httpMethod === 'HEAD') { $httpMethod = 'GET'; }
+        if ($httpMethod === 'HEAD') {
+            $httpMethod = 'GET';
+        }
 
         if (isset($this->staticRouteMap[$httpMethod][$uri])) {
-            
             $result = $this->dispatchStaticRoute($this->staticRouteMap[$httpMethod][$uri]);
             if ($result[0] === self::FOUND) {
                 return $result;
@@ -75,7 +76,6 @@ abstract class RegexBasedAbstract implements DispatcherInterface
 
         // If nothing else matches, try fallback routes
         if (isset($this->staticRouteMap['*'][$uri])) {
-
             $result = $this->dispatchStaticRoute($this->staticRouteMap['*'][$uri]);
             if ($result[0] === self::FOUND) {
                 return $result;

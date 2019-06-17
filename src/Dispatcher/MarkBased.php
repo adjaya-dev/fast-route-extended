@@ -22,8 +22,7 @@ class MarkBased extends RegexBasedAbstract
 
             // Allow Multiple routes matching same regex
             $routes = [];
-            foreach ($data['routeMap'][$matches['MARK']] as $key => $route) 
-            {
+            foreach ($data['routeMap'][$matches['MARK']] as $key => $route) {
                 list($route_id, $varNames) = $route;
 
                 $vars = [];

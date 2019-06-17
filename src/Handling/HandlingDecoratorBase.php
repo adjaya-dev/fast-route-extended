@@ -18,7 +18,7 @@ class HandlingDecoratorBase implements HandlingDecoratorInterface
         $this->Handling = $Handling;
     }
 
-    public function getChild(): HandlingInterface 
+    public function getChild(): HandlingInterface
     {
         return $this->Handling->getChild();
     }

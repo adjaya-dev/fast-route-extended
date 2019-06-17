@@ -7,4 +7,4 @@ namespace Adjaya\FastRoute;
 interface RouteCollectorDecoratorConfiguratorInterface extends ConfiguratorInterface
 {
     public function decorate(object $routeCollector): RouteCollectorDecoratorInterface;
-} 
+}

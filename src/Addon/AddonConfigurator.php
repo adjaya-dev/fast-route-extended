@@ -39,7 +39,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
         }
 
         if (isset($options['handlingProviderDecorators']) && $options['handlingProviderDecorators']) {
-            foreach($options['handlingProviderDecorators'] as $decoratorClass => $options) {
+            foreach ($options['handlingProviderDecorators'] as $decoratorClass => $options) {
                 $this->addHandlingProviderDecorator(new $decoratorClass($options));
             }
         }
@@ -49,7 +49,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
         }
     }
 
-    public function setHandlingProvider(string $handlingProviderClass): AddonConfiguratorInterface  
+    public function setHandlingProvider(string $handlingProviderClass): AddonConfiguratorInterface
     {
         // TODO https://www.php.net/manual/fr/function.class-implements.php
         $this->handlingProviderClass = $handlingProviderClass;
@@ -67,8 +67,8 @@ class AddonConfigurator implements AddonConfiguratorInterface
     }
 
     public function addHandlingProviderDecorator(
-        HandlingProviderDecoratorConfiguratorInterface $decorator): AddonConfiguratorInterface
-    {
+        HandlingProviderDecoratorConfiguratorInterface $decorator
+    ): AddonConfiguratorInterface {
         $decorator = $decorator->provide();
 
         $class = key($decorator);
@@ -101,8 +101,7 @@ class AddonConfigurator implements AddonConfiguratorInterface
             $options['handlingProvider'] = $this->handlingProviderClass;
         }
 
-        if (!empty($this->handlingProviderDecorators)) 
-        {
+        if (!empty($this->handlingProviderDecorators)) {
             $options['handlingProviderDecorators'] = $this->handlingProviderDecorators;
         }
 

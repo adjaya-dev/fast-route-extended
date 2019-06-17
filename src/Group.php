@@ -6,33 +6,33 @@ namespace Adjaya\FastRoute;
 
 class Group
 {
-    /** 
+    /**
      * @var string
      */
     public $id;
 
-    /** 
-     * @var string 
+    /**
+     * @var string
      */
     public $regex;
 
-    /** 
-     * @var array 
+    /**
+     * @var array
      */
     public $variables;
 
-    /** 
-     * @var string 
+    /**
+     * @var string
      */
     public $parentId;
 
-    /** 
-     * @var array 
+    /**
+     * @var array
      */
     public $regexMergedWithParents = [];
 
-    /** 
-     * @var array 
+    /**
+     * @var array
      */
     public $variablesMergedWithParents = [];
 
@@ -59,7 +59,7 @@ class Group
     /**
      * @return  array
      */
-    public function getMergedData(): array 
+    public function getMergedData(): array
     {
         return [$this->regexMergedWithParents, $this->variablesMergedWithParents];
     }

@@ -24,7 +24,7 @@ class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInte
      */
     protected $macros = ['auto' => true];
 
-    public function __construct(array $options) 
+    public function __construct(array $options)
     {
         foreach ($options['macroables'] as $scope => $macros) {
             $this->addMacros($scope, $macros);
@@ -33,8 +33,7 @@ class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInte
 
     public function addMacros(string $scope, $macros): HandlingProviderDecoratorConfiguratorInterface
     {
-        if (in_array($scope, $this->scopes)) 
-        {
+        if (in_array($scope, $this->scopes)) {
             if ($scope === 'auto' && !$scope) { // Default true
                 $this->macros['auto'] = false;
             } else {
@@ -47,7 +46,7 @@ class MacroableConfigurator implements HandlingProviderDecoratorConfiguratorInte
         return $this;
     }
 
-    public function provide(): array 
+    public function provide(): array
     {
         return [$this->macroableClass => $this->macros];
     }

@@ -18,7 +18,7 @@ class RouterDispatcher implements DispatcherInterface
         $this->Request = $Request;
     }
 
-    public function dispatch($uri) {
-
+    public function dispatch($uri)
+    {
     }
 }

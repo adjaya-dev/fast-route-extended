@@ -12,5 +12,6 @@ interface AddonConfiguratorInterface extends RouteCollectorDecoratorConfigurator
     public function setHandlingProvider(string $handlingProviderClass): AddonConfiguratorInterface;
     
     public function addHandlingProviderDecorator(
-        HandlingProviderDecoratorConfiguratorInterface $decorator): AddonConfiguratorInterface;
+        HandlingProviderDecoratorConfiguratorInterface $decorator
+    ): AddonConfiguratorInterface;
 }

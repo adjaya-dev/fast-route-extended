@@ -14,7 +14,7 @@ abstract class AbstractHandling
 
     abstract public function getAddons(): ?array;
 
-    abstract public function setChild(HandlingDecoratorInterface $child): void; 
+    abstract public function setChild(HandlingDecoratorInterface $child): void;
     
-    abstract public function getChild(): HandlingInterface; 
+    abstract public function getChild(): HandlingInterface;
 }

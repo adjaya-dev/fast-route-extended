@@ -30,22 +30,22 @@ class Handling extends AbstractHandling implements HandlingInterface
         $this->registerAddons($addons);
     }
 
-    public function getId(): ?string 
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function getRegisteredAddons(): array 
+    public function getRegisteredAddons(): array
     {
         return $this->registeredAddons;
     }
 
-    public function getAddons(): ?array 
+    public function getAddons(): ?array
     {
         return $this->addons;
     }
 
-    public function setChild(HandlingDecoratorInterface $child): void 
+    public function setChild(HandlingDecoratorInterface $child): void
     {
         if ($this->ChildHandling) {
             throw new Exception(
@@ -56,7 +56,7 @@ class Handling extends AbstractHandling implements HandlingInterface
         $this->ChildHandling = $child;
     }
 
-    public function getChild(): HandlingInterface 
+    public function getChild(): HandlingInterface
     {
         return $this->ChildHandling ? $this->ChildHandling : $this;
     }
@@ -77,27 +77,20 @@ class Handling extends AbstractHandling implements HandlingInterface
      */
     protected function pushAddons(array $_addons, array $addons_stack = []): array
     {
-        foreach ($_addons as $type => $addons) 
-        {
-            if (array_key_exists($type, $this->registeredAddons)) 
-            {
+        foreach ($_addons as $type => $addons) {
+            if (array_key_exists($type, $this->registeredAddons)) {
                 if ($this->registeredAddons[$type] === $type) {
-                    foreach ((array) $addons as $addon => $handlers) 
-                    {
+                    foreach ((array) $addons as $addon => $handlers) {
                         if (is_string($addon)) {
                             $addons_stack[$type][$addon] = $handlers;
                         } else {
-                            $addons_stack[$type][] = $handlers;  
+                            $addons_stack[$type][] = $handlers;
                         }
                     }
-                }
-                else {
-                    foreach ($addons as $addon => $handlers) 
-                    {
-                        if (in_array($addon, $this->registeredAddons[$type])) 
-                        {
-                            foreach ((array) $handlers as $handler) 
-                            {
+                } else {
+                    foreach ($addons as $addon => $handlers) {
+                        if (in_array($addon, $this->registeredAddons[$type])) {
+                            foreach ((array) $handlers as $handler) {
                                 $addons_stack[$type][$addon][] = $handler;
                             }
                         }

@@ -34,8 +34,9 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
     }
 
     public function afterAddRoute(
-        HandlingInterface $RouteHandling, string $route_id): HandlingInterface
-    {
+        HandlingInterface $RouteHandling,
+        string $route_id
+    ): HandlingInterface {
         return $this->HandlingProvider->afterAddRoute($RouteHandling, $route_id);
     }
 
@@ -49,7 +50,7 @@ class HandlingProviderDecoratorBase implements HandlingProviderInterface
         return $this->HandlingProvider->afterAddGroup($GroupHandling);
     }
 
-    public function getRegisteredAddons(): array 
+    public function getRegisteredAddons(): array
     {
         return $this->HandlingProvider->getRegisteredAddons();
     }
