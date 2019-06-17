@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
+use BadMethodCallException;
+
 class GroupHandlingDecoratorMacro extends HandlingDecoratorBase
 {
     use \Spatie\Macroable\Macroable {
@@ -22,7 +24,7 @@ class GroupHandlingDecoratorMacro extends HandlingDecoratorBase
         return parent::__call($method, $parameters);
     }
 
-    public static function __callStatic($method, $parameters): void
+    public static function __callStatic($method, $parameters): BadMethodCallException
     {
         parent::__callStatic($method, $parameters);
     }
