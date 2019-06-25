@@ -8,23 +8,9 @@ interface RouteCollectorInterface
 {
     public function getData(): array;
 
-    public function addGroup($prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null);
+    public function addGroup($prefix, callable $callback, CollectorInterface $collector): HandlingGroupInterface;
 
-    public function addRoute($httpMethod, $route, $handler);
+    public function addRoute($httpMethod, $route, $handler): HandlingRouteInterface;
 
-    public function getCurrentRouteId(): string;
-
-    public function get($route, $handler);
-
-    public function post($route, $handler);
-
-    public function put($route, $handler);
-
-    public function delete($route, $handler);
-
-    public function patch($route, $handler);
-
-    public function head($route, $handler);
-
-    public function any($route, $handler);
+    //public function getCurrentRouteId(): string;
 }

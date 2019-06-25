@@ -58,7 +58,6 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
             $mergedRegex,
             $mergedVariables
         );
-        var_dump($this->groupsStack[$groupId]);
     }
 
     public function getGroupData(string $groupId): array
@@ -141,7 +140,6 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
                 $prefix_regex_array
             );
         }
-        var_dump($this->methodToRegexToRoutesMap[$method][$route_regex]);
     }
 
     protected function buildRegexForGroup(array $groupData): array

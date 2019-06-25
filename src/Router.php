@@ -85,7 +85,11 @@ class Router
         }
 
         $routeDefinitionCallback = $this->routeDefinitionCallback;
-        $routeDefinitionCallback($routeCollector);
+
+        $collector = new Collector($routeCollector);
+        $routeDefinitionCallback($collector);
+
+        //$routeDefinitionCallback($routeCollector);
 
         return $routeCollector->getData();
     }

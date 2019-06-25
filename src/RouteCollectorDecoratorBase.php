@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute;
 
-use Adjaya\FastRoute\Handling\HandlingInterface;
-
 class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
 {
     /**
@@ -48,7 +46,7 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
 
     public function addGroup(
         $prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null
-    ): HandlingInterface {
+    ): HandlingGroupInterface {
         if (!$collector) {
             $collector = $this;
         }
@@ -56,42 +54,43 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
         return $this->RouteCollector->addGroup($prefix, $callback, $collector);
     }
     
-    public function addRoute($httpMethod, $route, $handler): HandlingInterface
+    public function addRoute($httpMethod, $route, $handler): HandlingRouteInterface
     {
-        return $this->RouteCollector->addRoute($httpMethod, $route, $handler);
+        return $this->RouteCollector->addRoute($httpMethods, $route, $handler);
     }
-
+    /*
     public function getCurrentRouteId(): string
     {
         return $this->RouteCollector->getCurrentRouteId();
     }
+    */
 
-    public function get($route, $handler): HandlingInterface
+    public function get($route, $handler)
     {
         return $this->addRoute('GET', $route, $handler);
     }
 
-    public function post($route, $handler): HandlingInterface
+    public function post($route, $handler)
     {
         return $this->addRoute('POST', $route, $handler);
     }
 
-    public function put($route, $handler): HandlingInterface
+    public function put($route, $handler)
     {
         return $this->addRoute('PUT', $route, $handler);
     }
 
-    public function delete($route, $handler): HandlingInterface
+    public function delete($route, $handler)
     {
         return $this->addRoute('DELETE', $route, $handler);
     }
 
-    public function patch($route, $handler): HandlingInterface
+    public function patch($route, $handler)
     {
         return $this->addRoute('PATCH', $route, $handler);
     }
 
-    public function head($route, $handler): HandlingInterface
+    public function head($route, $handler)
     {
         return $this->addRoute('HEAD', $route, $handler);
     }

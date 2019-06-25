@@ -14,7 +14,7 @@ class RouteCollector implements RouteCollectorInterface
     protected $groupIdPrefix = 'group_';
     protected $groupIdCount = 0;
     protected $currentGroup;
-    protected $currentGroupHandling;
+    protected $currentHandlingGroup;
 
     /**
      * Routes Data.
@@ -41,14 +41,14 @@ class RouteCollector implements RouteCollectorInterface
         $this->routeParser = $routeParser;
         $this->dataGenerator = $dataGenerator;
         $this->currentGroup = new Group(); // Main group
-        $this->currentGroupHandling = new GroupHandling($this->currentGroup);
+        $this->currentHandlingGroup = new HandlingGroup($this->currentGroup);
     }
 
-    public function __call(string $method, array $params): GroupHandling
+    public function __call(string $method, array $params): HandlingGroup
     {
         try {
             return call_user_func_array(
-                [$this->currentGroupHandling, $method], $params
+                [$this->currentHandlingGroup, $method], $params
             );
         } catch (Throwable $e) {
             throw new exception ($e->getMessage());
@@ -159,8 +159,8 @@ class RouteCollector implements RouteCollectorInterface
      * @param string|array $prefix
      */
     public function addGroup(
-        $prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null
-    ): GroupHandling
+        $prefix, callable $callback, CollectorInterface $collector
+    ): HandlingGroupInterface
     {
         if (!$collector) {
             $collector = $this;
@@ -175,15 +175,15 @@ class RouteCollector implements RouteCollectorInterface
         $previousGroup = $this->currentGroup;
         $group = $this->currentGroup = new Group($prefix, $group_name);
 
-        $previousGroupHandling = $this->currentGroupHandling;
-        $groupHandling = $this->currentGroupHandling = new GroupHandling($group);
+        $previousHandlingGroup = $this->currentHandlingGroup;
+        $groupHandling = $this->currentHandlingGroup = new HandlingGroup($group);
 
         $previousGroup->addGroup($group);          
 
         $callback($collector);
 
         $this->currentGroup = $previousGroup;
-        $this->currentGroupHandling = $previousGroupHandling;
+        $this->currentHandlingGroup = $previousHandlingGroup;
 
         return $groupHandling;
     }
@@ -195,7 +195,7 @@ class RouteCollector implements RouteCollectorInterface
      *
      * @return string $route_id
      */
-    public function addRoute($httpMethods, $path, $handler): RouteHandling
+    public function addRoute($httpMethods, $path, $handler): HandlingRouteInterface
     {
         $name = '';
         if (\is_array($path)) {
@@ -212,9 +212,9 @@ class RouteCollector implements RouteCollectorInterface
 
         $this->currentGroup->addRoute($route);
         
-        return new RouteHandling($route);
+        return new HandlingRoute($route);
     }
-
+    /*
     public function getCurrentRouteId(): string
     {
         return $this->currentRouteId;
@@ -224,87 +224,5 @@ class RouteCollector implements RouteCollectorInterface
     {
         return $this->currentGroupId;
     }
-
-    /**
-     * Adds a GET route to the collection.
-     *
-     * This is simply an alias of $this->addRoute('GET', $route, $handler)
-     *
-     * @param string $route
-     * @param mixed  $handler
-     */
-    public function get($route, $handler)
-    {
-        return $this->addRoute('GET', $route, $handler);
-    }
-
-    /**
-     * Adds a POST route to the collection.
-     *
-     * This is simply an alias of $this->addRoute('POST', $route, $handler)
-     *
-     * @param string $route
-     * @param mixed  $handler
-     */
-    public function post($route, $handler)
-    {
-        return $this->addRoute('POST', $route, $handler);
-    }
-
-    /**
-     * Adds a PUT route to the collection.
-     *
-     * This is simply an alias of $this->addRoute('PUT', $route, $handler)
-     *
-     * @param string $route
-     * @param mixed  $handler
-     */
-    public function put($route, $handler)
-    {
-        return $this->addRoute('PUT', $route, $handler);
-    }
-
-    /**
-     * Adds a DELETE route to the collection.
-     *
-     * This is simply an alias of $this->addRoute('DELETE', $route, $handler)
-     *
-     * @param string $route
-     * @param mixed  $handler
-     */
-    public function delete($route, $handler)
-    {
-        return $this->addRoute('DELETE', $route, $handler);
-    }
-
-    /**
-     * Adds a PATCH route to the collection.
-     *
-     * This is simply an alias of $this->addRoute('PATCH', $route, $handler)
-     *
-     * @param string $route
-     * @param mixed  $handler
-     */
-    public function patch($route, $handler)
-    {
-        return $this->addRoute('PATCH', $route, $handler);
-    }
-
-    /**
-     * Adds a HEAD route to the collection.
-     *
-     * This is simply an alias of $this->addRoute('HEAD', $route, $handler)
-     *
-     * @param string $route
-     * @param mixed  $handler
-     */
-    public function head($route, $handler)
-    {
-        return $this->addRoute('HEAD', $route, $handler);
-    }
-
-    public function any($route, $handler)
-    {
-        return $this->addRoute('*', $route, $handler);
-    }
+    */
 }
