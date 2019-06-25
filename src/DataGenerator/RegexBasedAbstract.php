@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Adjaya\FastRoute\DataGenerator;
 
 use Adjaya\FastRoute\Exception\BadRouteException;
-use Adjaya\FastRoute\Group;
-use Adjaya\FastRoute\Route;
 use Exception;
 
 abstract class RegexBasedAbstract implements DataGeneratorInterface
@@ -36,7 +34,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
         $this->identicalsRegexRoutes = $allow;
     }
 
-    public function addGroup(array $groupData, string $groupId, ?string $parentGroupId): void
+    public function addGroup(array $groupData, string $groupId, ?string $parentGroupId = null): void
     {
         list($groupRegex, $groupVariables) = $this->buildRegexForGroup($groupData);
 
@@ -60,6 +58,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
             $mergedRegex,
             $mergedVariables
         );
+        var_dump($this->groupsStack[$groupId]);
     }
 
     public function getGroupData(string $groupId): array
@@ -142,6 +141,7 @@ abstract class RegexBasedAbstract implements DataGeneratorInterface
                 $prefix_regex_array
             );
         }
+        var_dump($this->methodToRegexToRoutesMap[$method][$route_regex]);
     }
 
     protected function buildRegexForGroup(array $groupData): array

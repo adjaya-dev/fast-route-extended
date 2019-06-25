@@ -6,73 +6,64 @@ namespace Adjaya\FastRoute;
 
 class Route
 {
-    /**
-     * @var string|array
-     */
-    public $httpMethod;
+    protected static $idCount = 0;
+    protected $id;
+    protected $httpMethods;
+    protected $path;
+    protected $handler;
+    protected $name;
 
-    /**
-     * @var string
-     */
-    public $regex;
-
-    /**
-     * @var array
-     */
-    public $variables;
-
-    /**
-     * @var string
-     */
-    public $id;
-
-    /**
-     * @var string|null
-     */
-    public $groupId;
-
-    /**
-     *  @var array
-     */
-    public $prefixRegex;
-
-    /**
-     * Constructs a route (value object).
-     *
-     * @param string|array $httpMethod
-     * @param string       $routeId
-     * @param string       $regex
-     * @param array        $variables
-     * @param string|null  $groupId
-     * @param array        $prefixRegex
-     */
-    public function __construct(
-        $httpMethod,
-        string $routeId,
-        string $regex,
-        array $variables,
-        ?string $groupId,
-        array $prefixRegex
-    ) {
-        $this->httpMethod = $httpMethod;
-        $this->id = $routeId;
-        $this->regex = $regex;
-        $this->variables = $variables;
-        $this->groupId = $groupId;
-        $this->prefixRegex = $prefixRegex;
+    public function __construct($httpMethods = [], $path = '/', $handler = [], $name = '')
+    {
+        $this->id = 'route_'. self::$idCount++;
+        $this->httpMethods = (array) $httpMethods;
+        $this->path = (string) $path;
+        $this->handler = $handler;
+        $this->name = (string) $name;
     }
 
-    /**
-     * Tests whether this route matches the given string.
-     *
-     * @param string $str
-     *
-     * @return bool
-     */
-    public function matches(string $str): bool
+    public function getId(): string
     {
-        $regex = '~^' . implode('', $this->prefixRegex) . $this->regex . '$~';
+        return $this->id;
+    }
 
-        return (bool) preg_match($regex, $str);
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setPath(string $path)
+    {
+        $this->path = $path;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function setHttpMethods($httpMethods)
+    {
+        $this->httpMethods = (array) $httpMethods;
+    }
+
+    public function getHttpMethods(): array
+    {
+        return $this->httpMethods;
+    }
+
+    public function setHandler($handler)
+    {
+        $this->Handler = $handler;
+    }
+
+    public function getHandler()
+    {
+        return $this->handler;
     }
 }

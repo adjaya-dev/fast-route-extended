@@ -6,81 +6,56 @@ namespace Adjaya\FastRoute;
 
 class Group
 {
-    /**
-     * @var string
-     */
-    public $id;
+    protected static $idCount = 0;
+    protected $id;
+    protected $prefix;
+    protected $name;
+    protected $collection = [];
 
-    /**
-     * @var string
-     */
-    public $regex;
-
-    /**
-     * @var array
-     */
-    public $variables;
-
-    /**
-     * @var string
-     */
-    public $parentId;
-
-    /**
-     * @var array
-     */
-    public $regexMergedWithParents = [];
-
-    /**
-     * @var array
-     */
-    public $variablesMergedWithParents = [];
-
-    /**
-     * Constructs a group.
-     *
-     * @param string      $id
-     * @param string      $regex
-     * @param array       $variables
-     * @param string|null $parentId
-     * @param array       $mergedRegex
-     * @param array       $mergedVariables
-     */
-    public function __construct(
-        string $id,
-        string $regex,
-        array $variables,
-        ?string $parentId,
-        array $mergedRegex,
-        array $mergedVariables
-    ) {
-        $this->id = $id;
-        $this->regex = $regex;
-        $this->variables = $variables;
-        $this->parentId = $parentId;
-        $this->regexMergedWithParents = $mergedRegex;
-        $this->variablesMergedWithParents = $mergedVariables;
+    public function __construct(?string $prefix = '', ?string $name = '')
+    {
+        $this->id = 'group_' . self::$idCount++;
+        $this->prefix = $prefix;
+        $this->name = $name;
     }
 
-    /**
-     * @return array
-     */
-    public function getMergedData(): array
+    public function getId(): string
     {
-        return [$this->regexMergedWithParents, $this->variablesMergedWithParents];
+        return $this->id;
     }
 
-    /**
-     * Tests whether this group matches the given string.
-     *
-     * @param string $str
-     *
-     * @return bool
-     */
-    public function matches(string $str): bool
+    public function addRoute(Route $route)
     {
-        $regex = '~^' . implode('', $this->regexMergedWithParents) . '$~';
+        $this->collection[] = $route;
+    }
 
-        return (bool) preg_match($regex, $str);
+    public function addGroup(Group $group)
+    {
+        $this->collection[] = $group;
+    }
+
+    public function setPrefix(string $prefix)
+    {
+        $this->prefix = $prefix;
+    }
+
+    public function getPrefix(): string 
+    {
+        return $this->prefix;
+    }
+
+    public function setName(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function getName(): string 
+    {
+        return $this->name;
+    }
+
+    public function getCollection(): array
+    {
+        return $this->collection;
     }
 }
