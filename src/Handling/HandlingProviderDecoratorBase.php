@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Adjaya\FastRoute\Handling;
 
-class HandlingProviderDecoratorBase implements HandlingProviderInterface
+class HandlingProviderDecoratorBase implements HandlingProviderDecoratorInterface
 {
     protected $HandlingProvider;
 

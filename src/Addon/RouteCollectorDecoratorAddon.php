@@ -6,10 +6,12 @@ namespace Adjaya\FastRoute\Addon;
 
 use Adjaya\FastRoute\Handling\HandlingInterface;
 use Adjaya\FastRoute\Handling\HandlingProvider;
+use Adjaya\FastRoute\Handling\HandlingProviderDecoratorInterface;
 use Adjaya\FastRoute\Handling\HandlingProviderInterface;
 use Adjaya\FastRoute\RouteCollectorDecoratorInterface;
 use Adjaya\FastRoute\RouteCollectorInterface;
 use Exception;
+use Throwable;
 
 class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
 {
@@ -18,6 +20,10 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
      */
     protected $HandlingProvider;
 
+    //protected $previousGroupHandling;
+
+    protected $GroupHandling;
+
     public function __construct(RouteCollectorInterface $RouteCollector, ?array $options = null)
     {
         $this->RouteCollector = $RouteCollector;
@@ -25,6 +31,8 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
         if (!empty($options)) {
             $this->setOptions($options);
         }
+
+        $this->GroupHandling = $this->beforeAddGroup();
     }
 
     /**
@@ -47,36 +55,33 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
             $handlingProvider = HandlingProvider::class;
         }
 
-        $this->setHandlingProvider($handlingProvider, $options);
+        $this->HandlingProvider = $this->getHandlingProvider($handlingProvider, (array) $options);
 
         if (isset($options['handlingProviderDecorators'])) {
-            foreach ($options['handlingProviderDecorators'] as $decorator => $decorator_options) {
-                $this->setHandlingProviderDecorator($decorator, (array) $decorator_options);
+            foreach ($options['handlingProviderDecorators'] as $decorator => $options) {
+                $this->HandlingProvider =
+                    $this->getDecoratedHandlingProvider($decorator, (array) $options);
             }
         }
     }
 
-    protected function setHandlingProvider(string $handlingProvider, array $options): void
+    protected function getHandlingProvider(string $class, array $options): HandlingProviderInterface
     {
-        if (!$this->HandlingProvider) {
-            $this->validateHandlingProvider(new $handlingProvider($options));
-        }
+        return new $class($options);
     }
 
-    protected function setHandlingProviderDecorator(string $decorator, array $options)
+    protected function getDecoratedHandlingProvider(string $class, array $options): HandlingProviderDecoratorInterface
     {
-        $this->validateHandlingProvider(new $decorator($this->HandlingProvider, $options));
+        return new $class($this->HandlingProvider, $options);
     }
 
-    protected function validateHandlingProvider($HandlingProvider)
+    public function __call(string $method, array $params) : HandlingInterface
     {
-        if (!($HandlingProvider instanceof HandlingProviderInterface)) {
-            throw new Exception(
-                'HandlingProvider must be instance of HandlingProviderInterface'
-            );
+        try {
+            return call_user_func_array([$this->GroupHandling, $method], $params);
+        } catch (Throwable $e) {
+            throw new exception ($e->getMessage());
         }
-
-        $this->HandlingProvider = $HandlingProvider;
     }
 
     public function getData(): array
@@ -98,17 +103,20 @@ class RouteCollectorDecoratorAddon extends RouteCollectorDecoratorAddonBase
      * @return HandlingInterface new instance of GroupHandling
      */
     public function addGroup(
-        $prefix,
-        callable $callback,
-        RouteCollectorDecoratorInterface $collector = null
-    ): HandlingInterface {
+        $prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null
+    ): HandlingInterface
+    {
         if (!$collector) {
             $collector = $this;
         }
 
-        $GroupHandling = $this->beforeAddGroup();
+        $previousGroupHandling = $this->GroupHandling;
+
+        $this->GroupHandling = $GroupHandling = $this->beforeAddGroup();
 
         $this->RouteCollector->addGroup($prefix, $callback, $collector);
+
+        $this->GroupHandling = $previousGroupHandling;
 
         return $this->afterAddGroup($GroupHandling);
     }

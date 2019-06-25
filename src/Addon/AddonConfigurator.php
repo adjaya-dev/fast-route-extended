@@ -68,7 +68,8 @@ class AddonConfigurator implements AddonConfiguratorInterface
 
     public function addHandlingProviderDecorator(
         HandlingProviderDecoratorConfiguratorInterface $decorator
-    ): AddonConfiguratorInterface {
+    ): AddonConfiguratorInterface 
+    {
         $decorator = $decorator->provide();
 
         $class = key($decorator);

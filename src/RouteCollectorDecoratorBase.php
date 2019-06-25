@@ -16,8 +16,7 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
     protected $options;
 
     public function __construct(
-        RouteCollectorDecoratorInterface $RouteCollector,
-        ?array $options = null
+        RouteCollectorDecoratorInterface $RouteCollector, ?array $options = null
     ) {
         $this->RouteCollector = $RouteCollector;
 
@@ -42,16 +41,13 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
      * @param callable $callback
      */
     public function groupAddons(
-        callable $callback,
-        RouteCollectorDecoratorInterface $collector = null
+        callable $callback, RouteCollectorDecoratorInterface $collector = null
     ): HandlingInterface {
         return $this->addGroup('', $callback, $collector);
     }
 
     public function addGroup(
-        $prefix,
-        callable $callback,
-        RouteCollectorDecoratorInterface $collector = null
+        $prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null
     ): HandlingInterface {
         if (!$collector) {
             $collector = $this;
@@ -59,7 +55,7 @@ class RouteCollectorDecoratorBase implements RouteCollectorDecoratorInterface
 
         return $this->RouteCollector->addGroup($prefix, $callback, $collector);
     }
-
+    
     public function addRoute($httpMethod, $route, $handler): HandlingInterface
     {
         return $this->RouteCollector->addRoute($httpMethod, $route, $handler);

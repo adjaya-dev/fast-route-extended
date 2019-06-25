@@ -81,21 +81,38 @@ class Handling extends AbstractHandling implements HandlingInterface
             if (\array_key_exists($type, $this->registeredAddons)) {
                 if ($this->registeredAddons[$type] === $type) {
                     foreach ((array) $addons as $addon => $handlers) {
-                        if (\is_string($addon)) {
-                            $addons_stack[$type][$addon] = $handlers;
-                        } else {
+                        if (\is_int($addon)) {
                             $addons_stack[$type][] = $handlers;
+                        } else {
+                            $addons_stack[$type][][$addon] = $handlers;
                         }
                     }
                 } else {
+                    if (!is_array($addons)) {
+                        throw new Exception( //InvalidArgumentException
+                            "Invalid argument supplied for foreach()", 7
+                        );  
+                    }
                     foreach ($addons as $addon => $handlers) {
                         if (\in_array($addon, $this->registeredAddons[$type], true)) {
-                            foreach ((array) $handlers as $handler) {
-                                $addons_stack[$type][$addon][] = $handler;
+                            foreach ((array) $handlers as $k => $v) {
+                                if (\is_int($k)) {
+                                    $addons_stack[$type][$addon][] = $v;
+                                } else {
+                                    $addons_stack[$type][$addon][][$k] = $v;
+                                }
                             }
+                        } else {
+                            throw new Exception( //InvalidArgumentException
+                                "not such registered addon : {$type}['{$addon}']", 7
+                            ); 
                         }
                     }
                 }
+            } else {
+                throw new Exception( //InvalidArgumentException
+                    "not such registered addon : {$type}", 7
+                );
             }
         }
 

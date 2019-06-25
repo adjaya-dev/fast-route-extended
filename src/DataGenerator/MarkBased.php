@@ -13,6 +13,7 @@ class MarkBased extends RegexBasedAbstract
 
     protected function processChunk(array $regexToRoutesMap): array
     {
+        var_dump($regexToRoutesMap);
         $routeMap = [];
         $regexes = [];
         $markIndex = 0;

@@ -56,7 +56,7 @@ class RouteCollector implements RouteCollectorInterface
         echo '<pre>';
         print_r($routes_data);
         echo '</pre>';
-        */
+        //*/
         $routes_data['routes_data'] = $this->routesData;
 
         return $routes_data;
@@ -68,9 +68,7 @@ class RouteCollector implements RouteCollectorInterface
      * @param string|array $prefix
      */
     public function addGroup(
-        $prefix,
-        callable $callback,
-        RouteCollectorDecoratorInterface $collector = null
+        $prefix, callable $callback, RouteCollectorDecoratorInterface $collector = null
     ): void {
         if (!$collector) {
             $collector = $this;
@@ -142,7 +140,7 @@ class RouteCollector implements RouteCollectorInterface
         /* PARSE REVERSE */
         if ($route_name && method_exists($this->routeParser, 'parseReverse')) {
             if (isset($this->routesData['reverse']) &&
-                \in_array($route_name, $this->routesData['reverse'], true)
+                array_key_exists($route_name, $this->routesData['reverse'])
             ) {
                 throw new Exception(
                     "The route name '$route_name' is already used and must be unique!"
